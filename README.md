@@ -2,7 +2,8 @@
 Lineage 2 aCis 409 modified java server with Fake Players, Traders &amp; bots.
 
 **Usage example:**
-Patch the aCis 409 repository with given patch.diff
+
+Patch the aCis 409 repository with given patch.diff.
 First clone the aCis 409 repository and than copy the patch.diff 
 file into the root of your repository and apply patch.diff:
 ```
