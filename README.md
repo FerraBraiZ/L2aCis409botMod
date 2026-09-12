@@ -68,6 +68,9 @@ In the section "Database informations", put the same.
 After this update all scripts rights in ~/L2aCisMod/login/ 
 and after that also in ~/L2aCisMod/gameserver/ server directories.
 ```
+cd ~/L2aCisMod/login/
+chmod +x *.sh
+cd ~/L2aCisMod/gameserver/
 chmod +x *.sh
 ```
 * Than run ./RegisterGameServer.sh in ~/L2aCisMod/login/
