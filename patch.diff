@@ -1,0 +1,1423 @@
+diff --git a/aCis_datapack/data/xml/adminCommands.xml b/aCis_datapack/data/xml/adminCommands.xml
+index 0021f33a..3c12dfd4 100644
+--- a/aCis_datapack/data/xml/adminCommands.xml
++++ b/aCis_datapack/data/xml/adminCommands.xml
+@@ -1,6 +1,7 @@
+ <?xml version='1.0' encoding='utf-8'?>
+ <list>
+ 	<!-- ADMIN -->
++	<aCar name="admin_spawnbot" accessLevel="7" params="" desc="Spawn aCis 409 bot near Elven Village."/>
+ 	<aCar name="admin_admin" accessLevel="7" params="[1-4]" desc="Go through the different admin panels."/>
+ 	<aCar name="admin_buy" accessLevel="7" params="[id]" desc="Open the GM Shop panel, or the associated BuyList."/>
+ 	<aCar name="admin_camera" accessLevel="7" params="" desc="Toggle the CameraMode."/>
+diff --git a/aCis_datapack/data/xml/botClans.xml b/aCis_datapack/data/xml/botClans.xml
+new file mode 100644
+index 00000000..cfd2577b
+--- /dev/null
++++ b/aCis_datapack/data/xml/botClans.xml
+@@ -0,0 +1,13 @@
++<?xml version='1.0' encoding='utf-8'?>
++<list>
++	<clan id="CrescentNebula" name="CrescentNebula" lvl="4" castleID="8" alli="alse" crest=""/>
++	<clan id="Fellowship" name="Fellowship" lvl="4" castleID="2" alli="" crest=""/>
++	<clan id="TradeEmpire" name="TradeEmpire" lvl="4" castleID="3" alli="alse" crest=""/>
++	<clan id="KyrieElei" name="KyrieElei" lvl="4" castleID="4" alli="" crest=""/>
++	<clan id="ShadowBrook" name="ShadowBrook" lvl="4" castleID="0" alli="" crest=""/>
++	<clan id="SnowyOwl" name="SnowyOwl" lvl="4" castleID="5" alli="" crest=""/>
++	<clan id="TuxPenguin" name="TuxPenguin" lvl="4" castleID="0" alli="" crest=""/>
++	<clan id="Panthera" name="Panthera" lvl="4" castleID="0" alli="" crest=""/>
++	<clan id="RoaringLion" name="RoaringLion" lvl="4" castleID="0" alli="" crest=""/>
++	<clan id="Yzop" name="Yzop" lvl="4" castleID="9" alli="" crest=""/>
++</list>
+\ No newline at end of file
+diff --git a/aCis_datapack/sql/castle_manor_procure.sql b/aCis_datapack/sql/castle_manor_procure.sql
+index 3688607b..eda637fc 100644
+--- a/aCis_datapack/sql/castle_manor_procure.sql
++++ b/aCis_datapack/sql/castle_manor_procure.sql
+@@ -7,4 +7,43 @@ CREATE TABLE IF NOT EXISTS `castle_manor_procure` (
+  `reward_type` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  `next_period` TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
+   PRIMARY KEY (`castle_id`,`crop_id`,`next_period`)
+-);
+\ No newline at end of file
++);
++
++INSERT INTO `castle_manor_procure` (`castle_id`, `crop_id`, `amount`, `start_amount`, `price`, `reward_type`, `next_period`) VALUES
++(4, 5073, 8000, 8000, 125, 2, 0), -- Oren crop Dark Coda, revard Braided Hemp, current period
++(4, 5073, 8000, 8000, 125, 2, 1),
++(4, 5068, 7200, 7200, 125, 1, 0), 
++(4, 5068, 7200, 7200, 125, 1, 1), 
++(4, 5065, 7200, 7200, 125, 2, 0), 
++(4, 5065, 7200, 7200, 125, 2, 1), 
++(4, 5067, 3600, 3600, 200, 2, 0), 
++(4, 5067, 3600, 3600, 200, 2, 1), 
++(4, 5069, 1800, 1800, 250, 2, 0), 
++(4, 5069, 1800, 1800, 250, 2, 1), 
++(4, 5075, 1440, 1440, 400, 1, 0), 
++(4, 5075, 1440, 1440, 400, 1, 1), 
++(4, 5077, 720, 720, 450, 2, 0), 
++(4, 5077, 720, 720, 450, 2, 1), 
++(4, 5082, 720, 720, 700, 2, 0), 
++(4, 5082, 720, 720, 700, 2, 1), 
++(4, 5079, 720, 720, 700, 2, 0), 
++(4, 5079, 720, 720, 700, 2, 1), 
++(4, 5084, 720, 720, 700, 2, 0), 
++(4, 5084, 720, 720, 700, 2, 1), 
++(4, 5088, 900, 900, 500, 2, 0), 
++(4, 5088, 900, 900, 500, 2, 1), 
++(4, 5091, 720, 720, 550, 2, 0), 
++(4, 5091, 720, 720, 550, 2, 1), 
++(4, 5085, 900, 900, 500, 2, 0), 
++(4, 5085, 900, 900, 500, 2, 1), 
++(4, 5087, 720, 720, 500, 1, 0), 
++(4, 5087, 720, 720, 500, 1, 1), 
++(4, 5092, 720, 720, 500, 2, 0), 
++(4, 5092, 720, 720, 500, 2, 1), 
++(4, 6543, 206, 206, 1750, 1, 0), 
++(4, 6543, 206, 206, 1750, 1, 1), 
++(4, 6544, 180, 180, 3000, 2, 0), 
++(4, 6544, 180, 180, 3000, 2, 1), 
++(4, 6545, 160, 160, 2250, 2, 0), 
++(4, 6545, 160, 160, 2250, 2, 1);
++
+diff --git a/aCis_datapack/sql/castle_manor_production.sql b/aCis_datapack/sql/castle_manor_production.sql
+index 0015929e..fb8f3064 100644
+--- a/aCis_datapack/sql/castle_manor_production.sql
++++ b/aCis_datapack/sql/castle_manor_production.sql
+@@ -6,4 +6,43 @@ CREATE TABLE IF NOT EXISTS `castle_manor_production` (
+  `price` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  `next_period` TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
+  PRIMARY KEY (`castle_id`, `seed_id`, `next_period`)
+-);
+\ No newline at end of file
++);
++
++INSERT INTO `castle_manor_production` (`castle_id`, `seed_id`, `amount`, `start_amount`, `price`, `next_period`) VALUES
++(4, 5042, 6000, 6000, 50, 0), -- Oren seed Dark Coda, current period
++(4, 5042, 5500, 5500, 50, 1), -- entries ordered by seed lvl
++(4, 5043, 4000, 4000, 50, 0), 
++(4, 5043, 4000, 4000, 50, 1), 
++(4, 7020, 5000, 5000, 50, 0), 
++(4, 7020, 5000, 5000, 50, 1), 
++(4, 5044, 2000, 2000, 100, 0), 
++(4, 5044, 2000, 2000, 100, 1), 
++(4, 7026, 1500, 1500, 200, 0), 
++(4, 7026, 1500, 1500, 200, 1), 
++(4, 5046, 1200, 1200, 250, 0), 
++(4, 5046, 1200, 1200, 250, 1), 
++(4, 5047, 700, 700, 500, 0), 
++(4, 5047, 700, 700, 500, 1), 
++(4, 5048, 700, 700, 500, 0), 
++(4, 5048, 700, 700, 500, 1), 
++(4, 7025, 700, 700, 500, 0), 
++(4, 7025, 700, 700, 500, 1), 
++(4, 7027, 700, 700, 500, 0), 
++(4, 7027, 700, 700, 500, 1), 
++(4, 7053, 800, 800, 400, 0), 
++(4, 7053, 800, 800, 400, 1), 
++(4, 5049, 700, 700, 500, 0), 
++(4, 5049, 700, 700, 500, 1), 
++(4, 5050, 800, 800, 400, 0), 
++(4, 5050, 800, 800, 400, 1), 
++(4, 5051, 700, 700, 500, 0), 
++(4, 5051, 700, 700, 500, 1), 
++(4, 5052, 700, 700, 500, 0), 
++(4, 5052, 700, 700, 500, 1), 
++(4, 6774, 200, 200, 1750, 0), 
++(4, 6774, 200, 200, 1750, 1), 
++(4, 6762, 150, 150, 2000, 0), 
++(4, 6762, 150, 150, 2000, 1), 
++(4, 6754, 150, 150, 2250, 0), 
++(4, 6754, 150, 150, 2250, 1);
++
+diff --git a/aCis_datapack/sql/fake_trader_items.sql b/aCis_datapack/sql/fake_trader_items.sql
+new file mode 100644
+index 00000000..a76c8618
+--- /dev/null
++++ b/aCis_datapack/sql/fake_trader_items.sql
+@@ -0,0 +1,19 @@
++CREATE TABLE IF NOT EXISTS `fake_trader_items` (
++  `trader_id` INT NOT NULL AUTO_INCREMENT,
++  `item_id` INT NOT NULL,
++  `count` BIGINT NOT NULL,
++  `price` BIGINT NOT NULL,
++  FOREIGN KEY (`trader_id`) REFERENCES `fake_traders`(`id`) ON DELETE CASCADE
++);
++INSERT INTO `fake_trader_items` (`trader_id`, `item_id`, `count`, `price`) VALUES
++(1, 273, 1, 270000),   -- Composition Bow
++(1, 68, 1, 270000),    -- Falchion
++(1, 16, 1, 270000),    -- Long Spear
++(1, 219, 1, 270000),   -- Sword Breaker
++(1, 1458, 5000, 650),  -- Crystal: D-grade
++(2, 1458, 2400, 620),  -- Crystal: D-grade
++(2, 1874, 100, 14999), -- Oriharukon Ore
++(2, 1876, 100, 11000), -- Mithril Ore
++(3, 1804, 1, 20),      -- Recipe: Soulshot: D-grade
++(3, 3032, 1, 30),      -- Recipe: Spiritshot D
++(3, 3953, 1, 70);      -- Recipe: Spiritshot D
+diff --git a/aCis_datapack/sql/fake_traders.sql b/aCis_datapack/sql/fake_traders.sql
+new file mode 100644
+index 00000000..da06f04a
+--- /dev/null
++++ b/aCis_datapack/sql/fake_traders.sql
+@@ -0,0 +1,24 @@
++CREATE TABLE IF NOT EXISTS `fake_traders` (
++  `id` INT NOT NULL AUTO_INCREMENT,
++  `name` VARCHAR(35) NOT NULL,
++  `title` VARCHAR(35) DEFAULT '',
++  `class_id` INT NOT NULL,
++  `face` TINYINT UNSIGNED DEFAULT NULL,
++  `hairStyle` TINYINT UNSIGNED DEFAULT NULL,
++  `hairColor` TINYINT UNSIGNED DEFAULT NULL,
++  `sex` TINYINT UNSIGNED DEFAULT 0,
++  `race` TINYINT UNSIGNED DEFAULT NULL,
++  `x` INT NOT NULL,
++  `y` INT NOT NULL,
++  `z` INT NOT NULL,
++  `heading` MEDIUMINT DEFAULT NULL,
++  `store_type` TINYINT NOT NULL DEFAULT 1, -- 1: Sell, 8: Package Sell, 3: Buy, 5: Craft
++  `store_msg` VARCHAR(30) DEFAULT '',
++  `level` TINYINT UNSIGNED DEFAULT 1,
++  `clanName` VARCHAR(16) DEFAULT '',
++  PRIMARY KEY (`id`)
++);
++INSERT INTO `fake_traders` (`id`, `name`, `class_id`, `face`, `hairStyle`, `hairColor`, `sex`, `race`, `x`, `y`, `z`, `heading`, `store_type`, `store_msg`, `level`, `clanName`) VALUES
++(1, 'KyrieElei', 18, 0, 1, 0, 0, 1, 45472, 48283, -3056, 0, 1, 'WTS Top NG weapons, Dx', 18, 'KyrieElei'),
++(2, 'Keturah', 18, 0, 1, 0, 1, 1, 45549, 48313, -3056, 0, 3, 'WTB mats', 18, 'TradeEmpire'),
++(3, 'Bobika', 53, 0, 1, 0, 1, 4, 45381, 48288, -3056, 0, 5, 'crafting D shots', 18, 'TradeEmpire');
+diff --git a/aCis_gameserver/config/server.properties b/aCis_gameserver/config/server.properties
+index d3985051..a557133e 100644
+--- a/aCis_gameserver/config/server.properties
++++ b/aCis_gameserver/config/server.properties
+@@ -205,7 +205,7 @@ GMAudit = False
+ # =================================================================
+ 
+ # Activate or no the community board.
+-EnableCommunityBoard = False
++EnableCommunityBoard = True
+ 
+ # Show this community board section when you open it.
+ BBSDefault = _bbshome
+@@ -243,4 +243,4 @@ L2WalkerProtection = False
+ ZoneTown = 0
+ 
+ # Show "data/html/servnews.htm" when a character logins.
+-ShowServerNews = False
+\ No newline at end of file
++ShowServerNews = False
+diff --git a/aCis_gameserver/java/net/sf/l2j/gameserver/GameServer.java b/aCis_gameserver/java/net/sf/l2j/gameserver/GameServer.java
+index bf24b43b..453e0722 100644
+--- a/aCis_gameserver/java/net/sf/l2j/gameserver/GameServer.java
++++ b/aCis_gameserver/java/net/sf/l2j/gameserver/GameServer.java
+@@ -28,6 +28,7 @@ import net.sf.l2j.gameserver.data.manager.ClanHallManager;
+ import net.sf.l2j.gameserver.data.manager.CoupleManager;
+ import net.sf.l2j.gameserver.data.manager.CursedWeaponManager;
+ import net.sf.l2j.gameserver.data.manager.DerbyTrackManager;
++import net.sf.l2j.gameserver.data.manager.FakeTraderManager;
+ import net.sf.l2j.gameserver.data.manager.FestivalOfDarknessManager;
+ import net.sf.l2j.gameserver.data.manager.FishingChampionshipManager;
+ import net.sf.l2j.gameserver.data.manager.HeroManager;
+@@ -35,6 +36,7 @@ import net.sf.l2j.gameserver.data.manager.LotteryManager;
+ import net.sf.l2j.gameserver.data.manager.PartyMatchRoomManager;
+ import net.sf.l2j.gameserver.data.manager.PetitionManager;
+ import net.sf.l2j.gameserver.data.manager.RaidPointManager;
++import net.sf.l2j.gameserver.data.manager.ServerMetricsManager;
+ import net.sf.l2j.gameserver.data.manager.SevenSignsManager;
+ import net.sf.l2j.gameserver.data.manager.SpawnManager;
+ import net.sf.l2j.gameserver.data.manager.ZoneManager;
+@@ -237,6 +239,12 @@ public class GameServer
+ 		
+ 		CastleManager.getInstance().spawnEntities();
+ 		
++		ServerMetricsManager.getInstance();
++		LOGGER.info("Total adena picked per server: " + ServerMetricsManager.getTotalAdenaDropped()/*TOTAL_ADENA_DROP_PER_SERVER*/);
++		
++		LOGGER.info("Fake Trader System: Loading offline trade simulators...");
++		FakeTraderManager.getInstance().load();
++		
+ 		StringUtil.printSection("Olympiads & Heroes");
+ 		OlympiadGameManager.getInstance();
+ 		Olympiad.getInstance();
+diff --git a/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeTraderManager.java b/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeTraderManager.java
+new file mode 100644
+index 00000000..a1bf83c9
+--- /dev/null
++++ b/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeTraderManager.java
+@@ -0,0 +1,456 @@
++package net.sf.l2j.gameserver.data.manager;
++
++import java.sql.Connection;
++import java.sql.PreparedStatement;
++import java.sql.ResultSet;
++import net.sf.l2j.Config;
++import net.sf.l2j.commons.pool.ConnectionPool;
++import net.sf.l2j.gameserver.idfactory.IdFactory;
++import net.sf.l2j.gameserver.model.actor.Player;
++import net.sf.l2j.gameserver.model.actor.template.PlayerTemplate;
++import net.sf.l2j.gameserver.data.xml.PlayerData;
++import net.sf.l2j.gameserver.enums.actors.OperateType;
++import net.sf.l2j.gameserver.enums.actors.Sex;
++import net.sf.l2j.gameserver.model.actor.container.player.Appearance;
++import net.sf.l2j.gameserver.model.trade.TradeList;
++import net.sf.l2j.gameserver.model.trade.TradeItem;
++import net.sf.l2j.gameserver.model.records.ManufactureItem;
++import net.sf.l2j.gameserver.model.World;
++import net.sf.l2j.commons.logging.CLogger;
++import net.sf.l2j.gameserver.data.sql.ClanTable;
++import net.sf.l2j.gameserver.model.pledge.Clan;
++import net.sf.l2j.gameserver.network.serverpackets.UserInfo;
++import net.sf.l2j.gameserver.network.serverpackets.PledgeShowMemberListAdd;
++import net.sf.l2j.gameserver.model.BotClan;
++import net.sf.l2j.gameserver.data.xml.BotClanData;
++import java.util.List;
++import net.sf.l2j.gameserver.model.residence.castle.Castle;
++import java.util.Random;
++import net.sf.l2j.gameserver.model.actor.instance.FakePlayerAI;
++import net.sf.l2j.gameserver.model.craft.ManufactureList;
++import net.sf.l2j.gameserver.model.item.instance.ItemInstance;
++import net.sf.l2j.gameserver.data.xml.RecipeData;
++import net.sf.l2j.gameserver.model.records.Recipe;
++import net.sf.l2j.gameserver.skills.L2Skill;
++import net.sf.l2j.gameserver.data.SkillTable; // or SkillData depending on exact build
++
++public class FakeTraderManager
++{
++	private static final CLogger LOGGER = new CLogger(FakeTraderManager.class.getName());
++	
++	private static final List<BotClan> _botClans = BotClanData.getInstance().getBotClans();
++	
++	public static final FakeTraderManager getInstance()
++	{
++		return SingletonHolder._instance;
++	}
++	
++	public void load()
++	{
++		for (BotClan clan : _botClans)
++		{
++			try
++			{
++				spawnDummyFakeClanLeaders(clan.getName(), clan.getLvl(), clan.getCastleID());
++			}
++			catch (Exception e)
++			{
++				LOGGER.info("Error spawning dummy clan leaders: " + e.getMessage());
++			}
++			LOGGER.info("Loaded bot Clan: " + clan.getName());
++		}
++		
++		try (Connection con = ConnectionPool.getConnection();
++			PreparedStatement ps = con.prepareStatement("SELECT * FROM fake_traders");
++			ResultSet rs = ps.executeQuery())
++		{
++			while (rs.next())
++			{
++				spawnFakeTrader(rs);
++			}
++		}
++		catch (Exception e)
++		{
++			LOGGER.info("FakeTraderManager: Failed loading fake traders: " + e.getMessage());
++		}
++	}
++	
++	public void spawnFakeBots(Player player) throws Exception
++	{
++		Random rnd = new Random();
++		int classId = rnd.nextInt(2) == 1 ? 25 : 18;
++		
++		PlayerTemplate template = PlayerData.getInstance().getTemplate(classId);
++		
++		int objectId = IdFactory.getInstance().getNextId();
++		final Appearance app = new Appearance((byte) 1, (byte) 0, (byte) 1, Sex.MALE);
++		
++		Player fakePlayer = new Player(objectId, template, "", app);
++		
++		World.getInstance().addPlayer(fakePlayer);
++		
++		fakePlayer.setName("LionHeart");
++		fakePlayer.setTitle("");
++		
++		fakePlayer.setAccessLevel(Config.DEFAULT_ACCESS_LEVEL);
++		
++		// Coordinates
++		if (player != null)
++			fakePlayer.getPosition().set(player.getX(), player.getY(), player.getZ(), 0);
++		else
++			fakePlayer.getPosition().set(40050, 52475, -3296, 0);
++		
++		// Spawn into the game world
++		fakePlayer.spawnMe();
++		fakePlayer.onPlayerEnter();
++		
++		fakePlayer.setOnlineStatus(true, false);
++		
++		fakePlayer.getStatus().setLevel(rnd.nextInt(19) + 1); // should be (rnd.nextInt(13) + 7) for Skills
++		
++		fakePlayer.getStatus().initializeValues(); // maxHpMpCpBonus();
++		
++		fakePlayer.getStatus().setMp(fakePlayer.getStatus().getMaxMp());
++		
++		// 1. Calculate the exact XP needed for this level
++		long targetXp = fakePlayer.getStatus().getExpForLevel(6);
++		// 2. Subtract current XP to find the difference needed
++		long xpToAdd = targetXp - fakePlayer.getStatus().getExp();
++		// 3. Force add the experience (this automatically handles level up calculations, HP/MP updates, and status updates)
++		fakePlayer.addExpAndSp(xpToAdd, 0);
++		
++		fakePlayer.setRunning(true);
++		
++		// give some equipment
++		ItemInstance itemInst, itemInst2, itemInst3, itemInst4;
++		if (fakePlayer.isMageClass())
++		{
++			itemInst = ItemInstance.create(1101, 1); // Tunic of Devotion
++			fakePlayer.getInventory().addItem(itemInst);
++			itemInst2 = ItemInstance.create(1104, 1); // Stockings of Devotion
++			fakePlayer.getInventory().addItem(itemInst2);
++			itemInst3 = ItemInstance.create(44, 1); // Leather Helmet
++			fakePlayer.getInventory().addItem(itemInst3);
++			itemInst4 = ItemInstance.create(7816, 1); // Apprentice Adventurer's Staff
++			fakePlayer.getInventory().addItem(itemInst4);
++		}
++		else
++		{
++			itemInst = ItemInstance.create(23, 1); // Wooden Breastplate
++			fakePlayer.getInventory().addItem(itemInst);
++			itemInst2 = ItemInstance.create(43, 1); // Wooden Helmet
++			fakePlayer.getInventory().addItem(itemInst2);
++			itemInst3 = ItemInstance.create(2386, 1); // Wooden Gaiters
++			fakePlayer.getInventory().addItem(itemInst3);
++			itemInst4 = ItemInstance.create(7821, 1); // Apprentice Adventurer's Long Sword
++			fakePlayer.getInventory().addItem(itemInst4);
++		}
++		
++		ItemInstance itemInst4b = ItemInstance.create(51, 1);// Bracer
++		fakePlayer.getInventory().addItem(itemInst4b);
++		ItemInstance itemInst4c = ItemInstance.create(39, 1);// Boots
++		fakePlayer.getInventory().addItem(itemInst4c);
++		
++		ItemInstance itemInst5;
++		if (fakePlayer.isMageClass())
++		{
++			itemInst5 = ItemInstance.create(5790, 5000);// Spiritshot: No grade for beginners
++			fakePlayer.getInventory().addItem(itemInst5); // 2509,3000); Spiritshot: No grade
++		}
++		else
++		{
++			itemInst5 = ItemInstance.create(5789, 5000);// Soulshot: No grade for beginners
++			fakePlayer.getInventory().addItem(itemInst5); // 1835,3000); Soulshot: No grade
++		}
++		ItemInstance itemInst6 = ItemInstance.create(1539, 150);// Greater Healing potion
++		fakePlayer.getInventory().addItem(itemInst6);
++		
++		fakePlayer.getInventory().restore();
++		
++		fakePlayer.getInventory().equipItemAndRecord(itemInst);
++		fakePlayer.getInventory().equipItemAndRecord(itemInst2);
++		fakePlayer.getInventory().equipItemAndRecord(itemInst3);
++		fakePlayer.getInventory().equipItemAndRecord(itemInst4);
++		fakePlayer.getInventory().equipItemAndRecord(itemInst4b);
++		fakePlayer.getInventory().equipItemAndRecord(itemInst4c);
++		
++		// Force the server to broadcast the player's presence and store sign
++		fakePlayer.broadcastUserInfo();
++		
++		fakePlayer.sendInfo(fakePlayer);
++		// fakePlayer.getAI().notifyEvent(AiEventType.SAT_DOWN, null, null);
++		
++		// Start the AI behavior system loop immediately
++		net.sf.l2j.commons.pool.ThreadPool.execute(new FakePlayerAI(fakePlayer));
++		
++	}
++	
++	private static void spawnDummyFakeClanLeaders(String name, int lvl, int castleID) throws Exception
++	{
++		int classId = 18;
++		PlayerTemplate template = PlayerData.getInstance().getTemplate(classId);
++		
++		int objectId = IdFactory.getInstance().getNextId();
++		final Appearance app = new Appearance((byte) 1, (byte) 0, (byte) 1, Sex.MALE);
++		
++		Player fakePlayer = new Player(objectId, template, "", app);
++		
++		World.getInstance().addPlayer(fakePlayer);
++		
++		fakePlayer.setName(name + "Leader");
++		fakePlayer.setTitle("");
++		
++		fakePlayer.setAccessLevel(Config.DEFAULT_ACCESS_LEVEL);
++		
++		// Coordinates
++		fakePlayer.getPosition().set(0, 0, 0, 0);
++		
++		fakePlayer.getStatus().setLevel(19);
++		
++		try
++		{
++			final long cet = fakePlayer.getClanCreateExpiryTime();
++			
++			fakePlayer.setClanCreateExpiryTime(0);
++			
++			Clan clan = ClanTable.getInstance().getClanByName(name);
++			if (clan == null)
++			{
++				clan = ClanTable.getInstance().createClan(fakePlayer, name);
++				if (clan != null)
++					LOGGER.info("Bot clan " + name + " has been created. Clan leader is " + fakePlayer.getName() + ".");
++				else
++				{
++					fakePlayer.setClanCreateExpiryTime(cet);
++					LOGGER.info("There was a problem while creating the clan.");
++				}
++			}
++			if (clan != null)
++			{
++				clan.setLevel(lvl);
++				
++				if (castleID > 0)
++				{
++					// Assign castle owners for loaded clans with random tax percentage, Giran tax stays at 15%
++					Castle castle = CastleManager.getInstance().getCastleById(castleID);
++					if ((castle != null) && (clan.getLevel() >= Config.MINIMUM_CLAN_LEVEL))
++					{
++						castle.setOwner(clan);
++						Random rndTaxPerc = new Random(clan.getClanId());
++						castle.setCurrentTaxPercent(castleID == 3 ? 15 : rndTaxPerc.nextInt(16), true);
++					}
++					
++				}
++			}
++		}
++		catch (Exception e)
++		{
++			LOGGER.info("Invalid string parameter for //pledge create.");
++		}
++		
++		// Spawn into the game world
++		fakePlayer.spawnMe();
++		fakePlayer.onPlayerEnter();
++		
++		fakePlayer.setOnlineStatus(true, false);
++		
++		// Force the server to broadcast the player's presence and store sign
++		fakePlayer.broadcastUserInfo();
++		
++		fakePlayer.sendInfo(fakePlayer);
++		// fakePlayer.getAI().notifyEvent(AiEventType.SAT_DOWN, null, null);
++	}
++	
++	private void spawnFakeTrader(ResultSet rs) throws Exception
++	{
++		int classId = rs.getInt("class_id");
++		PlayerTemplate template = PlayerData.getInstance().getTemplate(classId);
++		
++		int objectId = IdFactory.getInstance().getNextId();
++		final Appearance app = new Appearance(rs.getByte("face"), rs.getByte("hairColor"), rs.getByte("hairStyle"), Sex.VALUES[rs.getByte("sex")]);
++		
++		Player fakePlayer = new Player(objectId, template, "", app);
++		
++		// fakePlayer.create(objectId, template, "", rs.getString("name"), rs.getByte("hairStyle"), rs.getByte("hairColor"), rs.getByte("face"), Sex.VALUES[rs.getByte("sex")]);
++		
++		World.getInstance().addPlayer(fakePlayer);
++		
++		fakePlayer.setName(rs.getString("name"));
++		fakePlayer.setTitle(rs.getString("title"));
++		
++		fakePlayer.setAccessLevel(Config.DEFAULT_ACCESS_LEVEL);
++		
++		// Coordinates
++		fakePlayer.getPosition().set(rs.getInt("x"), rs.getInt("y"), rs.getInt("z"), rs.getInt("heading"));
++		
++		fakePlayer.getStatus().setLevel(rs.getByte("level"));
++		
++		fakePlayer.getStatus().setMp(fakePlayer.getStatus().getMaxMp());
++		
++		try
++		{
++			final String clanName = rs.getString("clanName");
++			final long cet = fakePlayer.getClanCreateExpiryTime();
++			
++			fakePlayer.setClanCreateExpiryTime(0);
++			
++			Clan clan = ClanTable.getInstance().getClanByName(clanName);
++			if (clan == null)
++			{
++				clan = ClanTable.getInstance().createClan(fakePlayer, clanName);
++				if (clan != null)
++					LOGGER.info("Clan " + clanName + " have been created. Clan leader is " + fakePlayer.getName() + ".");
++				else
++				{
++					fakePlayer.setClanCreateExpiryTime(cet);
++					LOGGER.info("There was a problem while creating the clan.");
++				}
++			}
++			else
++			{
++				fakePlayer.setClan(clan);
++				clan.addClanMember(fakePlayer);
++				fakePlayer.sendPacket(new UserInfo(fakePlayer));
++				fakePlayer.sendPacket(new PledgeShowMemberListAdd(fakePlayer));
++				// // Save player clan info to database
++				// //fakePlayer.store();
++			}
++		}
++		catch (Exception e)
++		{
++			LOGGER.info("Invalid string parameter for //pledge create.");
++		}
++		
++		// Spawn into the game world
++		fakePlayer.spawnMe();
++		fakePlayer.onPlayerEnter();
++		
++		fakePlayer.setOnlineStatus(true, false);
++		
++		int storeType = rs.getInt("store_type"), traderID = rs.getInt("id");
++		
++		if (storeType == 5)
++		{
++			grantCraftSkills(fakePlayer, 9); // lvl 2 for no grades
++		}
++		
++		// LOGGER.info("bots prepared: " + storeType + " id " + traderID + " name: " + rs.getString("name"));
++		
++		fakePlayer.setOperateType(OperateType.values()[storeType]);
++		
++		TradeList tradeList = null;
++		ManufactureList manufactureList = null;
++		if (storeType == 1)
++		{
++			tradeList = fakePlayer.getSellList();
++		}
++		else if (storeType == 3)
++		{
++			tradeList = fakePlayer.getBuyList();
++		}
++		else if (storeType == 5)
++		{
++			manufactureList = fakePlayer.getManufactureList();
++		}
++		
++		try (Connection con = ConnectionPool.getConnection();
++			PreparedStatement ps = con.prepareStatement("SELECT * FROM fake_trader_items WHERE trader_id = ?"))
++		{
++			ps.setInt(1, traderID);
++			ResultSet rs2 = ps.executeQuery();
++			
++			while (rs2.next())
++			{
++				readFakeTraderItemsDB(fakePlayer, rs2, storeType, tradeList, manufactureList);
++			}
++		}
++		catch (Exception e)
++		{
++			LOGGER.info("FakeTraderManager: Failed loading fake traders: " + e.getMessage());
++		}
++		
++		fakePlayer.getInventory().restore();
++		
++		// fakePlayer.getInventory().equipItemAndRecord(itemInst);
++		
++		LOGGER.info("Trade bot " + rs.getString("name") + " has in inventory: " + fakePlayer.getInventory().getItems());
++		
++		if (storeType == 1)
++		{
++			fakePlayer.getSellList().setTitle(rs.getString("store_msg"));
++			fakePlayer.getSellList().updateItems(false);
++		}
++		else if (storeType == 3)
++		{
++			fakePlayer.getBuyList().setTitle(rs.getString("store_msg"));
++			fakePlayer.getBuyList().updateItems(true);
++		}
++		else if (storeType == 5)
++		{
++			ManufactureList storeList = fakePlayer.getManufactureList();
++			storeList.setStoreName(rs.getString("store_msg"));
++		}
++		
++		// Force the offline/sitting posture
++		fakePlayer.sitDown();
++		
++		// Force the server to broadcast the player's presence and store sign
++		fakePlayer.broadcastUserInfo();
++		
++		fakePlayer.sendInfo(fakePlayer);
++		// fakePlayer.getAI().notifyEvent(AiEventType.SAT_DOWN, null, null);
++	}
++	
++	private static void readFakeTraderItemsDB(Player fakePlayer, ResultSet rs, int storeType, TradeList tradeList, ManufactureList manufactureList) throws Exception
++	{
++		int itemId = rs.getInt("item_id"), count = rs.getInt("count"), price = rs.getInt("price");
++		
++		ItemInstance itemInst = ItemInstance.create(itemId, count); // Composition Bow
++		fakePlayer.getInventory().addItem(itemInst);
++		
++		if (storeType == 3)
++		{
++			ItemInstance itemInst2 = ItemInstance.create(57, count * price);// add some adena, for buyers only!!!
++			fakePlayer.getInventory().addItem(itemInst2);
++		}
++		
++		if (storeType == 5)
++		{
++			Recipe recipe = RecipeData.getInstance().getRecipeByItemId(itemInst.getItemId());
++			// putRecipe(Recipe recipe, boolean isDwarven, boolean saveOnDb)
++			fakePlayer.getRecipeBook().putRecipe(recipe, true, false);
++			manufactureList.add(new ManufactureItem(RecipeData.getInstance().getRecipeByItemId(itemId).id(), price, true));
++			// LOGGER.info(" recipe: "+RecipeData.getInstance().getRecipeByItemId(itemId).id());
++		}
++		else
++		{
++			tradeList.add(new TradeItem(itemInst, count, price));
++		}
++		
++	}
++	
++	public void grantCraftSkills(Player bot, int craftLevel)
++	{
++		// Skill 11: Dwarven Craft (Goes up to Level 9 for S-Grade items)
++		L2Skill dwarvenCraft = SkillTable.getInstance().getInfo(11, craftLevel);
++		if (dwarvenCraft != null)
++		{
++			bot.addSkill(dwarvenCraft, true);
++		}
++		
++		// Skill 172: Create Common Item (Used for shots, arrows, and custom recipes)
++		L2Skill commonCraft = SkillTable.getInstance().getInfo(172, craftLevel);
++		if (commonCraft != null)
++		{
++			bot.addSkill(commonCraft, true);
++		}
++		
++		// Refresh the bot's internal skill data
++		bot.getStatus().initializeValues(); // bot.getSkillList().calculate(); //bot.sendSkillList();
++	}
++	
++	private static class SingletonHolder
++	{
++		protected static final FakeTraderManager _instance = new FakeTraderManager();
++	}
++}
+diff --git a/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/ServerMetricsManager.java b/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/ServerMetricsManager.java
+new file mode 100644
+index 00000000..1cc41628
+--- /dev/null
++++ b/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/ServerMetricsManager.java
+@@ -0,0 +1,81 @@
++package net.sf.l2j.gameserver.data.manager;
++
++import java.sql.Connection;
++import java.sql.PreparedStatement;
++import java.util.concurrent.atomic.LongAdder;
++import net.sf.l2j.commons.logging.CLogger;
++import net.sf.l2j.commons.pool.ThreadPool;
++import net.sf.l2j.commons.pool.ConnectionPool;
++
++public class ServerMetricsManager
++{
++	private static final CLogger LOGGER = new CLogger(FakeTraderManager.class.getName());
++	
++	private static final String TOTAL_ADENA_DROP_PER_SERVER = "totalAdenaDrop"; // name of the column in server_memo table
++	
++	private static final LongAdder _totalAdenaDropped = new LongAdder();
++	
++	private ServerMetricsManager()
++	{
++		// Load the initial value from the DB on server startup
++		loadFromDatabase();
++		
++		// Start an elegant background task to save metrics every 2 minutes asynchronously
++		ThreadPool.scheduleAtFixedRate(this::saveToDatabase, 120000, 120000);
++	}
++	
++	public static void trackAdena(long amount)
++	{
++		_totalAdenaDropped.add(amount);
++	}
++	
++	public static long getTotalAdenaDropped()
++	{
++		return _totalAdenaDropped.sum();
++	}
++	
++	private void loadFromDatabase()
++	{
++		try (Connection con = ConnectionPool.getConnection();
++			PreparedStatement ps = con.prepareStatement("SELECT value FROM server_memo WHERE var = ?"))
++		{
++			ps.setString(1, TOTAL_ADENA_DROP_PER_SERVER);
++			var rs = ps.executeQuery();
++			if (rs.next())
++			{
++				_totalAdenaDropped.add(rs.getLong("value"));
++			}
++		}
++		catch (Exception e)
++		{
++			LOGGER.warn("ServerMetricsManager: Could not load adena drop metrics: " + e.getMessage());
++		}
++	}
++	
++	public void saveToDatabase()
++	{
++		try (Connection con = ConnectionPool.getConnection();
++			PreparedStatement ps = con.prepareStatement("INSERT INTO server_memo (var, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = ?"))
++		{
++			long currentTotal = getTotalAdenaDropped();
++			ps.setString(1, TOTAL_ADENA_DROP_PER_SERVER);
++			ps.setLong(2, currentTotal);
++			ps.setLong(3, currentTotal);
++			ps.executeUpdate();
++		}
++		catch (Exception e)
++		{
++			LOGGER.error("ServerMetricsManager: Failed to save adena drop metrics to DB: " + e.getMessage());
++		}
++	}
++	
++	public static ServerMetricsManager getInstance()
++	{
++		return SingletonHolder._instance;
++	}
++	
++	private static class SingletonHolder
++	{
++		protected static final ServerMetricsManager _instance = new ServerMetricsManager();
++	}
++}
+diff --git a/aCis_gameserver/java/net/sf/l2j/gameserver/data/xml/BotClanData.java b/aCis_gameserver/java/net/sf/l2j/gameserver/data/xml/BotClanData.java
+new file mode 100644
+index 00000000..cc9fb75b
+--- /dev/null
++++ b/aCis_gameserver/java/net/sf/l2j/gameserver/data/xml/BotClanData.java
+@@ -0,0 +1,49 @@
++package net.sf.l2j.gameserver.data.xml;
++
++import java.nio.file.Path;
++import java.util.ArrayList;
++import java.util.List;
++import net.sf.l2j.commons.data.xml.IXmlReader;
++import net.sf.l2j.gameserver.model.BotClan;
++import org.w3c.dom.Document;
++
++public final class BotClanData implements IXmlReader
++{
++	private final List<BotClan> _botClans = new ArrayList<>();
++	
++	protected BotClanData()
++	{
++		load();
++	}
++	
++	@Override
++	public void load()
++	{
++		parseFile("./data/xml/botClans.xml");
++		LOGGER.info("Loaded {} Bot Clans.", _botClans.size());
++	}
++	
++	@Override
++	public void parseDocument(Document doc, Path path)
++	{
++		forEach(doc, "list", listNode ->
++		{
++			forEach(listNode, "clan", clanNode -> _botClans.add(new BotClan(parseAttributes(clanNode))));
++		});
++	}
++	
++	public List<BotClan> getBotClans()
++	{
++		return _botClans;
++	}
++	
++	public static BotClanData getInstance()
++	{
++		return SingletonHolder.INSTANCE;
++	}
++	
++	private static class SingletonHolder
++	{
++		protected static final BotClanData INSTANCE = new BotClanData();
++	}
++}
+diff --git a/aCis_gameserver/java/net/sf/l2j/gameserver/handler/admincommandhandlers/AdminAdmin.java b/aCis_gameserver/java/net/sf/l2j/gameserver/handler/admincommandhandlers/AdminAdmin.java
+index 3b4d37e1..6c074f59 100644
+--- a/aCis_gameserver/java/net/sf/l2j/gameserver/handler/admincommandhandlers/AdminAdmin.java
++++ b/aCis_gameserver/java/net/sf/l2j/gameserver/handler/admincommandhandlers/AdminAdmin.java
+@@ -30,6 +30,7 @@ import net.sf.l2j.gameserver.model.records.AdminCommand;
+ import net.sf.l2j.gameserver.model.restart.RestartArea;
+ import net.sf.l2j.gameserver.model.restart.RestartPoint;
+ import net.sf.l2j.gameserver.model.spawn.ASpawn;
++import net.sf.l2j.gameserver.data.manager.FakeTraderManager;
+ import net.sf.l2j.gameserver.network.serverpackets.BuyList;
+ import net.sf.l2j.gameserver.network.serverpackets.CameraMode;
+ import net.sf.l2j.gameserver.network.serverpackets.ExServerPrimitive;
+@@ -48,12 +49,21 @@ public class AdminAdmin implements IAdminCommandHandler
+ 		"admin_help",
+ 		"admin_link",
+ 		"admin_msg",
+-		"admin_show"
++		"admin_show",
++		"admin_spawnbot"
+ 	};
+ 	
+ 	@Override
+ 	public void useAdminCommand(String command, Player player)
+ 	{
++		if (command.startsWith("admin_spawnbot")) {
++	    	try {
++	    		FakeTraderManager.getInstance().spawnFakeBots(player);
++	    	} catch (Exception e) {
++				player.sendMessage("There was problem spawning the bot.");
++	    	}
++		}
++		
+ 		if (command.startsWith("admin_admin"))
+ 			showMainPage(player, command);
+ 		else if (command.startsWith("admin_camera"))
+diff --git a/aCis_gameserver/java/net/sf/l2j/gameserver/model/BotClan.java b/aCis_gameserver/java/net/sf/l2j/gameserver/model/BotClan.java
+new file mode 100644
+index 00000000..4247ed71
+--- /dev/null
++++ b/aCis_gameserver/java/net/sf/l2j/gameserver/model/BotClan.java
+@@ -0,0 +1,76 @@
++package net.sf.l2j.gameserver.model;
++
++import net.sf.l2j.commons.data.StatSet;
++
++public class BotClan
++{
++	private String _id;
++	
++	private String _name;
++	
++	private int _lvl;
++	private int _castleID;
++	
++	private String _alliance;
++	
++	private String _crest;
++	
++	public BotClan(StatSet set)
++	{
++		_id = set.getString("id");
++		_name = set.getString("name");
++		_lvl = set.getInteger("lvl", 0);
++		_castleID = set.getInteger("castleID", 0);
++		_alliance = set.getString("alli");
++		_crest = set.getString("crest");
++	}
++	
++	/**
++	 * @return the {@link BotClan} id.
++	 */
++	public String getID()
++	{
++		return _id;
++	}
++	
++	/**
++	 * @return the {@link BotClan} name.
++	 */
++	public String getName()
++	{
++		return _name;
++	}
++	
++	/**
++	 * @return the clan level of the {@link BotClan}.
++	 */
++	public int getLvl()
++	{
++		return _lvl;
++	}
++	
++	/**
++	 * @return the castleID of the {@link BotClan}.
++	 */
++	public int getCastleID()
++	{
++		return _castleID;
++	}
++	
++	/**
++	 * @return the alliance of the {@link BotClan}.
++	 */
++	public String getAlliance()
++	{
++		return _alliance;
++	}
++	
++	/**
++	 * @return the crest file of the {@link BotClan}.
++	 */
++	public String getCrest()
++	{
++		return _crest;
++	}
++	
++}
+diff --git a/aCis_gameserver/java/net/sf/l2j/gameserver/model/actor/Player.java b/aCis_gameserver/java/net/sf/l2j/gameserver/model/actor/Player.java
+index f5a1be5f..46b7af1a 100644
+--- a/aCis_gameserver/java/net/sf/l2j/gameserver/model/actor/Player.java
++++ b/aCis_gameserver/java/net/sf/l2j/gameserver/model/actor/Player.java
+@@ -219,6 +219,7 @@ import net.sf.l2j.gameserver.taskmanager.GameTimeTaskManager;
+ import net.sf.l2j.gameserver.taskmanager.PvpFlagTaskManager;
+ import net.sf.l2j.gameserver.taskmanager.ShadowItemTaskManager;
+ import net.sf.l2j.gameserver.taskmanager.WaterTaskManager;
++import net.sf.l2j.gameserver.data.manager.ServerMetricsManager;
+ 
+ /**
+  * This class represents a player in the world.<br>
+@@ -473,7 +474,7 @@ public final class Player extends Playable
+ 	 * @param accountName The name of the account including this Player
+ 	 * @param app The PcAppearance of the Player
+ 	 */
+-	private Player(int objectId, PlayerTemplate template, String accountName, Appearance app)
++	public Player(int objectId, PlayerTemplate template, String accountName, Appearance app)
+ 	{
+ 		super(objectId, template);
+ 		
+@@ -1692,7 +1693,9 @@ public final class Player extends Playable
+ 	 * @param sendMessage : Send {@link SystemMessage} client notification if set to true.
+ 	 */
+ 	public void addAdena(int count, boolean sendMessage)
+-	{
++	{	
++		ServerMetricsManager.trackAdena(count);
++
+ 		if (sendMessage)
+ 			sendPacket(SystemMessage.getSystemMessage(SystemMessageId.EARNED_S1_ADENA).addNumber(count));
+ 		
+@@ -1733,6 +1736,8 @@ public final class Player extends Playable
+ 	 */
+ 	public void addAncientAdena(int count, boolean sendMessage)
+ 	{
++		ServerMetricsManager.trackAdena(count);
++		
+ 		if (sendMessage)
+ 			sendPacket(SystemMessage.getSystemMessage(SystemMessageId.EARNED_S2_S1_S).addItemName(PcInventory.ANCIENT_ADENA_ID).addNumber(count));
+ 		
+diff --git a/aCis_gameserver/java/net/sf/l2j/gameserver/model/actor/instance/FakePlayerAI.java b/aCis_gameserver/java/net/sf/l2j/gameserver/model/actor/instance/FakePlayerAI.java
+new file mode 100644
+index 00000000..9868653b
+--- /dev/null
++++ b/aCis_gameserver/java/net/sf/l2j/gameserver/model/actor/instance/FakePlayerAI.java
+@@ -0,0 +1,415 @@
++package net.sf.l2j.gameserver.model.actor.instance;
++
++import java.util.List;
++import net.sf.l2j.commons.pool.ThreadPool;
++import net.sf.l2j.gameserver.model.actor.Attackable;
++import net.sf.l2j.gameserver.model.actor.Player;
++import net.sf.l2j.gameserver.enums.IntentionType;
++import net.sf.l2j.gameserver.model.item.instance.ItemInstance;
++import net.sf.l2j.commons.math.MathUtil;
++import net.sf.l2j.commons.logging.CLogger;
++
++import net.sf.l2j.gameserver.enums.items.ShotType;
++import net.sf.l2j.gameserver.network.serverpackets.MagicSkillUse;
++import net.sf.l2j.gameserver.enums.items.CrystalType;
++import net.sf.l2j.gameserver.model.item.kind.Weapon;
++import net.sf.l2j.gameserver.handler.IItemHandler;
++import net.sf.l2j.gameserver.handler.ItemHandler;
++
++import net.sf.l2j.gameserver.data.SkillTable; // or SkillData depending on exact build
++import net.sf.l2j.gameserver.skills.L2Skill;
++import net.sf.l2j.gameserver.model.records.Timestamp;
++import net.sf.l2j.gameserver.model.location.Location;
++
++public class FakePlayerAI implements Runnable
++{
++	private static final CLogger LOGGER = new CLogger(FakePlayerAI.class.getName());
++	
++	private final Player _bot;
++	
++	public FakePlayerAI(Player bot)
++	{
++		_bot = bot;
++	}
++	
++	@Override
++	public void run()
++	{
++		// 1. Safety Check: If the bot disconnected, died, or logged out, stop the AI loop
++		if (_bot == null || !_bot.isOnline() || _bot.isDead())
++			return;
++		
++		// hp potions
++		double currentHpPercent = _bot.getStatus().getHpRatio(); // Returns a value between 0.0 and 1.0
++		
++		if (currentHpPercent <= 0.50) // Trigger when HP drops below 50%
++		{
++			// Check if the bot isn't already under a healing potion cooldown or effect
++			// Standard Greater HP Potion Item ID in Lineage 2 is 1539
++			int potionItemId = 1539;
++			
++			// Find the item instance inside the bot's inventory container
++			ItemInstance potion = _bot.getInventory().getItemByItemId(potionItemId);
++			
++			if (potion != null)
++			{
++				// Native aCis 409 call to simulate a player right-clicking / using an item
++				// _bot.getInventory().useEquipItem(potion, false);
++				
++				final IItemHandler handler = ItemHandler.getInstance().getHandler(potion.getEtcItem());
++				if (handler != null)
++					handler.useItem(_bot, potion, false);
++			}
++		}
++		
++		ItemInstance closestDrop = findNearbyItem(/* SEARCH_RADIUS */_bot.isMageClass() ? 750 : 150);
++		if (closestDrop != null && !(_bot.getAI().getCurrentIntention().getType() == IntentionType.ATTACK))
++		{
++			_bot.setTarget(closestDrop);
++			
++			if (MathUtil.checkIfInRange(50, _bot, closestDrop, true))
++			{
++				// Stop moving and tell aCis AI to pick up the item
++				_bot.getAI().tryToIdle();
++				_bot.getAI().tryToPickUp(closestDrop.getObjectId(), false);
++				_bot.setTarget(null); // Clear target so it re-evaluates next cycle
++				
++				// Pause briefly for the pickup animation to complete
++				ThreadPool.schedule(this, 1200);
++			}
++			else
++			{
++				// Move directly to the dropped item
++				_bot.getMove().maybeMoveToLocation(closestDrop.getPosition(), 0, true, false);
++				
++				// Run the loop faster while traveling to check distance frequently
++				ThreadPool.schedule(this, 500);
++			}
++			return; // Break early so the bot doesn't look for monsters while looting
++		}
++		
++		// 2. Target Acquisition: Find a nearby monster if we don't have one
++		if (_bot.getTarget() == null || !(_bot.getTarget() instanceof Attackable) || ((Attackable) _bot.getTarget()).isDead())
++		{
++			useNextTargetManhattan(_bot);
++			
++			Attackable target = (Attackable) _bot.getTarget();
++			if (_bot.getTarget() == null)
++			{
++				target = findNearbyMonster(1500); // Look in a 1500-radius circle
++			}
++			if (target != null)
++			{
++				_bot.setTarget(target);
++				if (_bot.isMageClass())
++				{
++					Attackable monster = (Attackable) _bot.getTarget();
++					// tryChargeShots(_bot);
++					do
++					{
++						useSkill(_bot, monster, 1177); // Wind Strike
++						useSkill(_bot, monster, 1184); // Ice Bolt
++						
++						try
++						{
++							// Pause execution for 200 milliseconds (0.2 seconds)
++							Thread.sleep(200);
++						}
++						catch (InterruptedException e)
++						{
++							// Handle the exception if the thread is interrupted while sleeping
++							Thread.currentThread().interrupt();
++						}
++					}
++					while (!monster.isDead());
++				}
++			}
++			else
++			{
++				// No monsters found, make the bot move randomly to "explore"
++				moveRandomly(450);
++				ThreadPool.schedule(this, 4000); // Re-run AI check in 4 seconds
++				return;
++			}
++		}
++		
++		// 3. Combat Logic
++		Attackable monster = (Attackable) _bot.getTarget();
++		
++		// Is the bot close enough to attack?
++		if (!_bot.isMageClass())
++		{
++			if (MathUtil.checkIfInRange(100, _bot, monster, true)) // 100 range for fighters
++			{
++				tryChargeShots(_bot);
++				
++				useSkill(_bot, monster, 3); // Power Strike
++				
++				_bot.getAI().tryToAttack(monster); // .setIntention(IntentionType.ATTACK, monster);
++			}
++			else
++			{
++				// Move toward the monster
++				// _bot.getMove().maybeMoveToPawn(monster, 0, false);
++				_bot.getMove().maybeMoveToLocation(monster.getPosition(), 0, true, false);
++			}
++		}
++		
++		// 4. Loop execution: Repeat the AI logic every 1.5 seconds during combat
++		ThreadPool.schedule(this, 1500);
++	}
++	
++	/**
++	 * Finds the closest valid visible item on the ground.
++	 * @param radius
++	 * @return
++	 */
++	public ItemInstance findNearbyItem(int radius)
++	{
++		// Iterate through all items currently known/visible to the bot
++		for (ItemInstance item : _bot.getKnownType(ItemInstance.class))
++		{
++			// Skip items that are null, invisible, or already being decayed/looted
++			if (item == null || !item.isVisible())
++				continue;
++				
++			// Uses internal short-circuit logic (no square root calculations)
++			// Parameters: (int range, WorldObject obj1, WorldObject obj2, boolean includeZ)
++			if (MathUtil.checkIfInRange(radius, _bot, item, true))
++			{
++				return item; // Returns the first valid item found within the box/radius
++			}
++		}
++		
++		return null; // Return null if no items are within the specified radius
++	}
++	
++	private Attackable findNearbyMonster(int radius)
++	{
++		// Fetch all objects inside the player's visibility range
++		List<Attackable> monsters = _bot.getKnownTypeInRadius(Attackable.class, radius);
++		for (Attackable monster : monsters)
++		{
++			if (!monster.isDead() && monster.isAttackableWithoutForceBy(_bot))
++			{
++				return monster;
++			}
++		}
++		return null;
++	}
++	
++	private void moveRandomly(int offset)
++	{
++		int newX = _bot.getX() + (net.sf.l2j.commons.random.Rnd.get(offset * 2) - offset);
++		int newY = _bot.getY() + (net.sf.l2j.commons.random.Rnd.get(offset * 2) - offset);
++		_bot.getMove().maybeMoveToLocation(new Location(newX, newY, _bot.getZ()), 0, true, false);
++	}
++	
++	public void tryChargeShots(Player bot)
++	{
++		// 1. Ensure the bot actually has a weapon equipped
++		ItemInstance weaponInstance = bot.getActiveWeaponInstance();
++		if (weaponInstance == null)
++			return;
++		
++		// 2. Determine which shot type to use based on the weapon's properties
++		ShotType shotType = ShotType.SOULSHOT; // Default
++		int shotId = 0;
++		
++		Weapon weapon = (Weapon) (weaponInstance.getItem());
++		// aCis 409 uses weapon item templates to check magical vs physical
++		// characteristics
++		if (weapon.isMagical())
++		{
++			// Check if weapon is mage-oriented, assign Blessed Spiritshot (or regular)
++			shotType = ShotType.BLESSED_SPIRITSHOT;
++			shotId = getSpiritshotIdForGrade(weaponInstance.getItem().getCrystalType());
++		}
++		else
++		{
++			if (bot.isMageClass())
++			{
++				shotType = ShotType.SPIRITSHOT;
++				shotId = getSpiritshotIdForGrade(weaponInstance.getItem().getCrystalType());
++			}
++			else
++			{
++				shotType = ShotType.SOULSHOT;
++				shotId = getSoulshotIdForGrade(weaponInstance.getItem().getCrystalType());
++			}
++		}
++		
++		// 3. Check if the shot is already charged to prevent wasting items
++		if (bot.isChargedShot(shotType))
++			return;
++		
++		// 4. Look for the item in the bot's inventory
++		ItemInstance shotItem = bot.getInventory().getItemByItemId(shotId);
++		if (shotItem != null && bot.getInventory().destroyItem(shotItem, 1) != null)
++		{
++			// 5. Charge the shot on the bot's weapon
++			bot.setChargedShot(shotType, true);
++			
++			// 6. Broadcast the visual shot charging effect animation to surrounding players
++			bot.broadcastPacket(new MagicSkillUse(bot, bot, shotType == ShotType.SOULSHOT ? 2154 : 2160, 1, 0, 0));
++		}
++	}
++	
++	private static int getSoulshotIdForGrade(CrystalType grade)
++	{
++		return switch (grade)
++		{
++			// case NONE -> 1835; // Soulshot: No Grade
++			case NONE -> 5789; // Soulshot: No Grade For Beginners
++			case D -> 1463; // Soulshot: D-Grade
++			case C -> 1464; // Soulshot: C-Grade
++			case B -> 1465; // Soulshot: B-Grade
++			case A -> 1466; // Soulshot: A-Grade
++			case S -> 1467; // Soulshot: S-Grade
++		};
++	}
++	
++	private static int getSpiritshotIdForGrade(CrystalType grade)
++	{
++		return switch (grade)
++		{
++			// case NONE -> 3947; // Blessed Spiritshot: No Grade
++			case NONE -> 5790; // Spiritshot: No grade for beginners
++			case D -> 3948; // Blessed Spiritshot: D-Grade
++			case C -> 3949; // Blessed Spiritshot: C-Grade
++			case B -> 3950; // Blessed Spiritshot: B-Grade
++			case A -> 3951; // Blessed Spiritshot: A-Grade
++			case S -> 3952; // Blessed Spiritshot: S-Grade
++		};
++	}
++	
++	/**
++	 * Next target selection using fast coordinate delta arithmetic.
++	 * @param bot
++	 */
++	public void useNextTargetManhattan(Player bot)
++	{
++		final int nextTargetRadius = 350;
++		List<Attackable> nearbyMonsters = bot.getKnownTypeInRadius(Attackable.class, nextTargetRadius);
++		
++		Attackable closestMonster = null;
++		int closestManhattanDistance = Integer.MAX_VALUE;
++		
++		for (Attackable monster : nearbyMonsters)
++		{
++			if (monster == null || monster.isDead() || !monster.isVisible() || !monster.isAttackableWithoutForceBy(bot))
++			{
++				continue;
++			}
++			
++			// Pure coordinate delta subtraction (No squaring, No getDistance calls)
++			int deltaX = Math.abs(bot.getX() - monster.getX());
++			int deltaY = Math.abs(bot.getY() - monster.getY());
++			int currentManhattanDistance = deltaX + deltaY;
++			
++			if (currentManhattanDistance < closestManhattanDistance)
++			{
++				closestManhattanDistance = currentManhattanDistance;
++				closestMonster = monster;
++			}
++		}
++		
++		if (closestMonster != null)
++		{
++			bot.setTarget(closestMonster);
++		}
++	}
++	
++	// public int getMaximumSkillLevel(Player bot, int skillId)
++	// {
++	// int maxAllowedLevel = 0;
++	// int currentBotLevel = bot.getStatus().getLevel();
++	//
++	// // 1. Fetch the L2OFF-style skill list from the bot's class template
++	// for (SkillNode node : bot.getTemplate().getSkills())
++	// {
++	// // 2. Check if the node matches your target skill ID
++	// if (node.getId() == skillId)
++	// {
++	// // 3. Ensure the bot meets the hardcoded level requirement for this node level
++	// if (currentBotLevel >= node.getMinLvl())
++	// {
++	// // 4. Continually track the highest valid level encounter
++	// if (node.getValue() > maxAllowedLevel)
++	// {
++	// maxAllowedLevel = node.getValue();
++	// }
++	// }
++	// }
++	// }
++	//
++	// return maxAllowedLevel; // Returns 0 if the class cannot use this skill at their current level
++	// }
++	
++	public static int getMaximumSkillLevel(Player bot, int skillId)
++	{
++		if (bot == null)
++		{
++			return 1;
++		}
++		
++		// 1. Get the absolute maximum level this skill can possibly achieve on the
++		// entire server
++		int absoluteMaxLevel = SkillTable.getInstance().getMaxLevel(skillId);
++		if (absoluteMaxLevel <= 1)
++		{
++			return 1; // If it's a single-level skill (like a toggle or custom buff), stop here
++		}
++		
++		int botLevel = bot.getStatus().getLevel();
++		
++		// 2. Base nuke scaling math (Ice Bolt, Wind Strike, Prominence, Hydro Blast,
++		// etc.)
++		// Level 7 character gets level 1. Level 20 character gets level 6. Level 74+
++		// gets max level.
++		int calculatedLevel = 1;
++		
++		if (botLevel >= 74)
++		{
++			calculatedLevel = absoluteMaxLevel; // Cap at max retail tier for endgame characters
++		}
++		else if (botLevel > 7)
++		{
++			// Linear projection: rough interpolation of skill acquisition pacing
++			calculatedLevel = 1 + (int) Math.floor((botLevel - 7) / 2.5);
++		}
++		
++		// 3. Safety boundaries: Clamp the level so it never goes below 1 or overflows
++		// server data limits
++		return Math.max(1, Math.min(calculatedLevel, absoluteMaxLevel));
++	}
++	
++	public boolean useSkill(Player _bot, Attackable monster, int skillId)
++	{
++		int skillLevel = getMaximumSkillLevel(_bot, skillId); // buggy
++		
++		L2Skill selectedSkill = SkillTable.getInstance().getInfo(skillId, skillLevel);
++		
++		// LOGGER.info("casting skill: " + selectedSkill + " skillLevel: " + skillLevel + " skillId: " + skillId);
++		
++		// 1. Check if the skill is currently on cooldown (Reuse Delay)
++		Timestamp timestamp = selectedSkill != null ? _bot.getReuseTimeStamp().get(selectedSkill.getId()) : null;
++		
++		// LOGGER.info("Bot MP: " + _bot.getStatus().getMp() + " getMpConsume(): " + (selectedSkill != null ? selectedSkill.getMpConsume() : null));
++		
++		if (timestamp != null && timestamp.hasNotPassed())
++		{
++			// Skill is NOT reused yet. Abort casting and let the bot do something else.
++			return false;
++		}
++		
++		// 2. Check if the bot has enough MP to cast it
++		if (selectedSkill != null && _bot.getStatus().getMp() < selectedSkill.getMpConsume())
++		{
++			return false; // Not enough MP
++		}
++		_bot.getAI().tryToCast(monster, selectedSkill);
++		tryChargeShots(_bot);
++		return true;
++	}
++}
