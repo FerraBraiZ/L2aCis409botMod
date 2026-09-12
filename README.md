@@ -25,6 +25,13 @@ mkdir L2aCisMod
 cp -r ~/git/acis_public/aCis_gameserver/build/dist/ ~/L2aCisMod
 cp -r ~/git/acis_public/aCis_datapack/build/ ~/L2aCisMod
 ```
+* Than copy L2OFF Interlude geodata (can be found on the internet),
+into ~/L2aCisMod/gameserver/data/geodata directory.
+If you want to use L2J geodata, configure it in
+~/L2aCisMod/gameserver/config/geoengine.properties
+
+Set GeoDataType = L2J
+
 * You need MariaDB to run the server, on Ubuntu Linux:
 ```
 sudo apt install mariadb-server mariadb-client galera-4
