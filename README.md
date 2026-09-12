@@ -93,4 +93,5 @@ You can see the login/ and gameserver/logs server directories, if there are any 
 * Tax rate for those territories are set randomly, except for Giran's 15% tax.
 * Total adena dropped is tracked in 'server_memo' database table,
   which gets updated into database every 2 minutes.
+* Community server is running by default.
 * GNU General Public License v2.0
