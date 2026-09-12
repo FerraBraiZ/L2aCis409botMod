@@ -15,7 +15,7 @@ cd acis_public
 git apply patch.diff
 ```
 
-* Than build the source as normally. i.e. through Eclipse Ant build.xml.
+* Than build the source as normally. i.e. through Eclipse Ant build.xml (import the project first).
 Both projects aCis_datapack and aCis_gameserver have to be build.
 Guide on Linux:
 Copy the build files into ~/L2aCisMod/ directory.
@@ -69,7 +69,7 @@ in ~/L2aCisMod/login/ directory.
 Move this file into ~/L2aCisMod/gameserver/config directory as hexid.txt
 * Than run ./startLoginServer.sh in ~/L2aCisMod/login/ directory.
 * And ./startGameServer.sh in ~/L2aCisMod/gameserver/ directory
-You can see the login/ and gameserver/logs directories, if there are any errors.
+You can see the login/ and gameserver/logs server directories, if there are any errors.
 * Connect with Interlude client, which connects to localhost, 127.0.0.1
 
 **Release notes**
