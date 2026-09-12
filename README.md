@@ -2,7 +2,7 @@
 Lineage 2 aCis 409 modified java server with Fake Players, Traders &amp; bots.
 
 **Usage example:**
-* Patch the aCis 409 repository with given patch.diff
+Patch the aCis 409 repository with given patch.diff
 First clone the aCis 409 repository and than copy the patch.diff 
 file into the root of your repository and apply patch.diff:
 ```
@@ -14,15 +14,15 @@ cd acis_public
 git apply patch.diff
 ```
 
-* Than build the source as normally. i.e. through Eclipse Ant build.xml
+* Than build the source as normally. i.e. through Eclipse Ant build.xml.
 Both projects aCis_datapack and aCis_gameserver have to be build.
 Guide on Linux:
-Copy the build files into ~/L2aCisMod
+Copy the build files into ~/L2aCisMod/ directory.
 ```
 cd ~
 mkdir L2aCisMod
-cp ~/git/acis_public/aCis_gameserver/build/dist/ ~/L2aCisMod
-cp ~/git/acis_public/aCis_datapack/build/ ~/L2aCisMod
+cp -r ~/git/acis_public/aCis_gameserver/build/dist/ ~/L2aCisMod
+cp -r ~/git/acis_public/aCis_datapack/build/ ~/L2aCisMod
 ```
 * You need MariaDB to run the server, on Ubuntu Linux:
 ```
@@ -68,7 +68,7 @@ in ~/L2aCisMod/login/ directory.
 Move this file into ~/L2aCisMod/gameserver/config directory as hexid.txt
 * Than run ./startLoginServer.sh in ~/L2aCisMod/login/ directory.
 * And ./startGameServer.sh in ~/L2aCisMod/gameserver/ directory
-You can see the login/ and gameserver/logs directory, if there are any errors.
+You can see the login/ and gameserver/logs directories, if there are any errors.
 * Connect with Interlude client, which connects to localhost, 127.0.0.1
 
 **Release notes**
