@@ -130,31 +130,6 @@ index 0015929e..fb8f3064 100644
 +(4, 6754, 150, 150, 2250, 0), 
 +(4, 6754, 150, 150, 2250, 1);
 +
-diff --git a/aCis_datapack/sql/fake_trader_items.sql b/aCis_datapack/sql/fake_trader_items.sql
-new file mode 100644
-index 00000000..a76c8618
---- /dev/null
-+++ b/aCis_datapack/sql/fake_trader_items.sql
-@@ -0,0 +1,19 @@
-+CREATE TABLE IF NOT EXISTS `fake_trader_items` (
-+  `trader_id` INT NOT NULL AUTO_INCREMENT,
-+  `item_id` INT NOT NULL,
-+  `count` BIGINT NOT NULL,
-+  `price` BIGINT NOT NULL,
-+  FOREIGN KEY (`trader_id`) REFERENCES `fake_traders`(`id`) ON DELETE CASCADE
-+);
-+INSERT INTO `fake_trader_items` (`trader_id`, `item_id`, `count`, `price`) VALUES
-+(1, 273, 1, 270000),   -- Composition Bow
-+(1, 68, 1, 270000),    -- Falchion
-+(1, 16, 1, 270000),    -- Long Spear
-+(1, 219, 1, 270000),   -- Sword Breaker
-+(1, 1458, 5000, 650),  -- Crystal: D-grade
-+(2, 1458, 2400, 620),  -- Crystal: D-grade
-+(2, 1874, 100, 14999), -- Oriharukon Ore
-+(2, 1876, 100, 11000), -- Mithril Ore
-+(3, 1804, 1, 20),      -- Recipe: Soulshot: D-grade
-+(3, 3032, 1, 30),      -- Recipe: Spiritshot D
-+(3, 3953, 1, 70);      -- Recipe: Spiritshot D
 diff --git a/aCis_datapack/sql/fake_traders.sql b/aCis_datapack/sql/fake_traders.sql
 new file mode 100644
 index 00000000..da06f04a
@@ -185,6 +160,31 @@ index 00000000..da06f04a
 +(1, 'KyrieElei', 18, 0, 1, 0, 0, 1, 45472, 48283, -3056, 0, 1, 'WTS Top NG weapons, Dx', 18, 'KyrieElei'),
 +(2, 'Keturah', 18, 0, 1, 0, 1, 1, 45549, 48313, -3056, 0, 3, 'WTB mats', 18, 'TradeEmpire'),
 +(3, 'Bobika', 53, 0, 1, 0, 1, 4, 45381, 48288, -3056, 0, 5, 'crafting D shots', 18, 'TradeEmpire');
+diff --git a/aCis_datapack/sql/fake_traders_items.sql b/aCis_datapack/sql/fake_traders_items.sql
+new file mode 100644
+index 00000000..2750c688
+--- /dev/null
++++ b/aCis_datapack/sql/fake_traders_items.sql
+@@ -0,0 +1,19 @@
++CREATE TABLE IF NOT EXISTS `fake_traders_items` (
++  `trader_id` INT NOT NULL AUTO_INCREMENT,
++  `item_id` INT NOT NULL,
++  `count` BIGINT NOT NULL,
++  `price` BIGINT NOT NULL,
++  FOREIGN KEY (`trader_id`) REFERENCES `fake_traders`(`id`) ON DELETE CASCADE
++);
++INSERT INTO `fake_trader_items` (`trader_id`, `item_id`, `count`, `price`) VALUES
++(1, 273, 1, 270000),   -- Composition Bow
++(1, 68, 1, 270000),    -- Falchion
++(1, 16, 1, 270000),    -- Long Spear
++(1, 219, 1, 270000),   -- Sword Breaker
++(1, 1458, 5000, 650),  -- Crystal: D-grade
++(2, 1458, 2400, 620),  -- Crystal: D-grade
++(2, 1874, 100, 14999), -- Oriharukon Ore
++(2, 1876, 100, 11000), -- Mithril Ore
++(3, 1804, 1, 20),      -- Recipe: Soulshot: D-grade
++(3, 3032, 1, 30),      -- Recipe: Spiritshot D
++(3, 3953, 1, 70);      -- Recipe: Spiritshot D
 diff --git a/aCis_gameserver/config/server.properties b/aCis_gameserver/config/server.properties
 index d3985051..a557133e 100644
 --- a/aCis_gameserver/config/server.properties
@@ -206,18 +206,19 @@ index d3985051..a557133e 100644
 \ No newline at end of file
 +ShowServerNews = False
 diff --git a/aCis_gameserver/java/net/sf/l2j/gameserver/GameServer.java b/aCis_gameserver/java/net/sf/l2j/gameserver/GameServer.java
-index bf24b43b..453e0722 100644
+index bf24b43b..450f7bc8 100644
 --- a/aCis_gameserver/java/net/sf/l2j/gameserver/GameServer.java
 +++ b/aCis_gameserver/java/net/sf/l2j/gameserver/GameServer.java
-@@ -28,6 +28,7 @@ import net.sf.l2j.gameserver.data.manager.ClanHallManager;
+@@ -28,6 +28,8 @@ import net.sf.l2j.gameserver.data.manager.ClanHallManager;
  import net.sf.l2j.gameserver.data.manager.CoupleManager;
  import net.sf.l2j.gameserver.data.manager.CursedWeaponManager;
  import net.sf.l2j.gameserver.data.manager.DerbyTrackManager;
++import net.sf.l2j.gameserver.data.manager.FakeNameManager;
 +import net.sf.l2j.gameserver.data.manager.FakeTraderManager;
  import net.sf.l2j.gameserver.data.manager.FestivalOfDarknessManager;
  import net.sf.l2j.gameserver.data.manager.FishingChampionshipManager;
  import net.sf.l2j.gameserver.data.manager.HeroManager;
-@@ -35,6 +36,7 @@ import net.sf.l2j.gameserver.data.manager.LotteryManager;
+@@ -35,6 +37,7 @@ import net.sf.l2j.gameserver.data.manager.LotteryManager;
  import net.sf.l2j.gameserver.data.manager.PartyMatchRoomManager;
  import net.sf.l2j.gameserver.data.manager.PetitionManager;
  import net.sf.l2j.gameserver.data.manager.RaidPointManager;
@@ -225,12 +226,14 @@ index bf24b43b..453e0722 100644
  import net.sf.l2j.gameserver.data.manager.SevenSignsManager;
  import net.sf.l2j.gameserver.data.manager.SpawnManager;
  import net.sf.l2j.gameserver.data.manager.ZoneManager;
-@@ -237,6 +239,12 @@ public class GameServer
+@@ -237,6 +240,14 @@ public class GameServer
  		
  		CastleManager.getInstance().spawnEntities();
  		
 +		ServerMetricsManager.getInstance();
 +		LOGGER.info("Total adena picked per server: " + ServerMetricsManager.getTotalAdenaDropped()/*TOTAL_ADENA_DROP_PER_SERVER*/);
++		
++		FakeNameManager.getInstance().load();
 +		
 +		LOGGER.info("Fake Trader System: Loading offline trade simulators...");
 +		FakeTraderManager.getInstance().load();
@@ -238,12 +241,126 @@ index bf24b43b..453e0722 100644
  		StringUtil.printSection("Olympiads & Heroes");
  		OlympiadGameManager.getInstance();
  		Olympiad.getInstance();
+diff --git a/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeNameManager.java b/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeNameManager.java
+new file mode 100644
+index 00000000..452b03d6
+--- /dev/null
++++ b/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeNameManager.java
+@@ -0,0 +1,108 @@
++package net.sf.l2j.gameserver.data.manager; // Place in an appropriate manager folder
++
++import java.io.BufferedReader;
++import java.io.File;
++import java.io.FileReader;
++import java.nio.charset.StandardCharsets;
++import java.util.ArrayList;
++import java.util.Collections;
++import java.util.List;
++import java.util.Set;
++import java.util.concurrent.ConcurrentHashMap;
++import net.sf.l2j.commons.logging.CLogger;
++
++import net.sf.l2j.commons.random.Rnd;
++import net.sf.l2j.gameserver.model.World;
++
++public class FakeNameManager
++{
++	private static final CLogger LOGGER = new CLogger(FakeNameManager.class.getName());
++    
++    private final List<String> _availableNames = new ArrayList<>();
++    
++    // Tracks names currently in use on the server to prevent duplicates
++    private final Set<String> _usedNames = ConcurrentHashMap.newKeySet();
++
++    protected FakeNameManager()
++    {
++        load();
++    }
++
++    public void load()
++    {
++        _availableNames.clear();
++        _usedNames.clear();
++
++        File file = new File("./data/fake_names.txt");
++        if (!file.exists())
++        {
++        	LOGGER.warn("FakeNameManager: Target file data/fake_names.txt missing!");
++            return;
++        }
++
++        try (BufferedReader br = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8)))
++        {
++            String line;
++            while ((line = br.readLine()) != null)
++            {
++                line = line.trim();
++                // Skip empty lines, comments, or strings violating client max name length (16 characters)
++                if (line.isEmpty() || line.startsWith("#") || line.length() > 16)
++                    continue;
++
++                _availableNames.add(line);
++            }
++        }
++        catch (Exception e)
++        {
++        	LOGGER.warn("FakeNameManager: Error reading fake player name configurations: " + e.getMessage());
++        }
++
++        // Shuffle the list immediately to avoid sequential patterns
++        Collections.shuffle(_availableNames);
++        LOGGER.info("FakeNameManager: Loaded " + _availableNames.size() + " unique bot names.");
++    }
++
++    /**
++     * Retrieves a clean, unique random name that isn't currently active in the game world.
++     */
++    public String requestUniqueName()
++    {
++        if (_availableNames.isEmpty())
++            return "Bot_" + Rnd.get(1000, 9999); // Safe hardcoded fallback
++
++        // Attempt up to 20 times to find an unused name from the pool
++        for (int i = 0; i < 20; i++)
++        {
++            String name = _availableNames.get(Rnd.get(_availableNames.size()));
++            
++            // Core safety checks: Not already assigned to a bot, and not active on a real player
++            if (!_usedNames.contains(name) && World.getInstance().getPlayer(name) == null)
++            {
++                _usedNames.add(name);
++                return name;
++            }
++        }
++
++        // Final fallback if pool is fully exhausted or experiencing heavy collisions
++        return "Trader_" + Rnd.get(10000, 99999);
++    }
++
++    /**
++     * Always free up the name when your fake bot logs out or gets deleted!
++     */
++    public void releaseName(String name)
++    {
++        _usedNames.remove(name);
++    }
++
++    public static FakeNameManager getInstance()
++    {
++        return SingletonHolder.INSTANCE;
++    }
++
++    private static class SingletonHolder
++    {
++        protected static final FakeNameManager INSTANCE = new FakeNameManager();
++    }
++}
 diff --git a/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeTraderManager.java b/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeTraderManager.java
 new file mode 100644
-index 00000000..a1bf83c9
+index 00000000..729888da
 --- /dev/null
 +++ b/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeTraderManager.java
-@@ -0,0 +1,456 @@
+@@ -0,0 +1,739 @@
 +package net.sf.l2j.gameserver.data.manager;
 +
 +import java.sql.Connection;
@@ -251,17 +368,23 @@ index 00000000..a1bf83c9
 +import java.sql.ResultSet;
 +import net.sf.l2j.Config;
 +import net.sf.l2j.commons.pool.ConnectionPool;
++import net.sf.l2j.commons.random.Rnd;
++
 +import net.sf.l2j.gameserver.idfactory.IdFactory;
 +import net.sf.l2j.gameserver.model.actor.Player;
 +import net.sf.l2j.gameserver.model.actor.template.PlayerTemplate;
 +import net.sf.l2j.gameserver.data.xml.PlayerData;
++import net.sf.l2j.gameserver.enums.AiEventType;
 +import net.sf.l2j.gameserver.enums.actors.OperateType;
 +import net.sf.l2j.gameserver.enums.actors.Sex;
++import net.sf.l2j.gameserver.enums.items.CrystalType;
 +import net.sf.l2j.gameserver.model.actor.container.player.Appearance;
 +import net.sf.l2j.gameserver.model.trade.TradeList;
 +import net.sf.l2j.gameserver.model.trade.TradeItem;
 +import net.sf.l2j.gameserver.model.records.ManufactureItem;
 +import net.sf.l2j.gameserver.model.World;
++import net.sf.l2j.gameserver.model.WorldObject;
++
 +import net.sf.l2j.commons.logging.CLogger;
 +import net.sf.l2j.gameserver.data.sql.ClanTable;
 +import net.sf.l2j.gameserver.model.pledge.Clan;
@@ -269,22 +392,31 @@ index 00000000..a1bf83c9
 +import net.sf.l2j.gameserver.network.serverpackets.PledgeShowMemberListAdd;
 +import net.sf.l2j.gameserver.model.BotClan;
 +import net.sf.l2j.gameserver.data.xml.BotClanData;
++import net.sf.l2j.gameserver.data.xml.ItemData;
++
++import java.util.ArrayList;
 +import java.util.List;
 +import net.sf.l2j.gameserver.model.residence.castle.Castle;
 +import java.util.Random;
++
 +import net.sf.l2j.gameserver.model.actor.instance.FakePlayerAI;
 +import net.sf.l2j.gameserver.model.craft.ManufactureList;
 +import net.sf.l2j.gameserver.model.item.instance.ItemInstance;
++import net.sf.l2j.gameserver.model.item.kind.Item;
 +import net.sf.l2j.gameserver.data.xml.RecipeData;
 +import net.sf.l2j.gameserver.model.records.Recipe;
 +import net.sf.l2j.gameserver.skills.L2Skill;
 +import net.sf.l2j.gameserver.data.SkillTable; // or SkillData depending on exact build
++import net.sf.l2j.gameserver.model.location.Location;
++import net.sf.l2j.gameserver.data.manager.FakeNameManager;
 +
 +public class FakeTraderManager
 +{
 +	private static final CLogger LOGGER = new CLogger(FakeTraderManager.class.getName());
 +	
 +	private static final List<BotClan> _botClans = BotClanData.getInstance().getBotClans();
++	
++	private static final List<Integer> D_GRADE_ITEM_IDS = new ArrayList<>();
 +	
 +	public static final FakeTraderManager getInstance()
 +	{
@@ -293,6 +425,8 @@ index 00000000..a1bf83c9
 +	
 +	public void load()
 +	{
++		loadDGradeItems();
++		
 +		for (BotClan clan : _botClans)
 +		{
 +			try
@@ -312,13 +446,234 @@ index 00000000..a1bf83c9
 +		{
 +			while (rs.next())
 +			{
-+				spawnFakeTrader(rs);
++				spawnFakeTraderDB(rs);
++				
++				for (int i = 0; i < 50; i++)
++					spawnRndFakeTrader(null);
++				
 +			}
 +		}
 +		catch (Exception e)
 +		{
 +			LOGGER.info("FakeTraderManager: Failed loading fake traders: " + e.getMessage());
 +		}
++		
++	}
++	
++	public static void loadDGradeItems()
++	{
++		D_GRADE_ITEM_IDS.clear();
++		
++		// Loop through every item template registered in the aCis core XML engine
++		for (Item template : ItemData.getInstance().getTemplates())
++		{
++			if (template == null)
++				continue;
++			
++			// Check if the item is explicitly D-Grade
++			if (template.getCrystalType() == CrystalType.D)
++			{
++				// Optional: Filter out quest items, adena, or arrows if desired
++				if (template.isQuestItem())
++					continue;
++				
++				D_GRADE_ITEM_IDS.add(template.getItemId());
++			}
++		}
++		
++		LOGGER.info("DGradePicker: Cached " + D_GRADE_ITEM_IDS.size() + " D-Grade items.");
++	}
++	
++	/**
++	 * Picks a random D-Grade Item ID from the cached pool.
++	 * @return a valid item ID, or 0 if something went wrong or cache is empty.
++	 */
++	public static int getRandomDGradeItemId()
++	{
++		if (D_GRADE_ITEM_IDS.isEmpty())
++		{
++			return 0; // Fallback or safety boundary check
++		}
++		
++		// Use the native aCis core Rnd manager to fetch a random index
++		return D_GRADE_ITEM_IDS.get(Rnd.get(D_GRADE_ITEM_IDS.size()));
++	}
++	
++	private void spawnRndFakeTrader(String locationd)
++	{
++		Random rnd = new Random();
++		List<Integer> classIdList = List.of(0, 10, 18, 31, 44/* , 53 */);
++		int classId = 18;
++		
++		// Always check if the list is empty first to avoid exceptions
++		if (!classIdList.isEmpty())
++		{
++			// Get a random index between 0 (inclusive) and list.size() (exclusive)
++			int randomIndex = rnd.nextInt(classIdList.size());
++			
++			// Retrieve the item
++			classId = classIdList.get(randomIndex);
++		}
++		
++		PlayerTemplate template = PlayerData.getInstance().getTemplate(classId);
++		
++		int objectId = IdFactory.getInstance().getNextId();
++		
++		// final Appearance app = new Appearance(rs.getByte("face"), rs.getByte("hairColor"), rs.getByte("hairStyle"), Sex.VALUES[rs.getByte("sex")]);
++		final Appearance app = new Appearance((byte) rnd.nextInt(3), (byte) rnd.nextInt(4), (byte) rnd.nextInt(5), rnd.nextInt(2) == 1 ? Sex.MALE : Sex.FEMALE);
++		
++		Player fakePlayer = new Player(objectId, template, "", app);
++		
++		// fakePlayer.create(objectId, template, "", rs.getString("name"), rs.getByte("hairStyle"), rs.getByte("hairColor"), rs.getByte("face"), Sex.VALUES[rs.getByte("sex")]);
++		
++		World.getInstance().addPlayer(fakePlayer);
++		
++		String fakePlayerName = FakeNameManager.getInstance().requestUniqueName();
++		FakeNameManager.getInstance().releaseName(fakePlayerName);
++		fakePlayer.setName(fakePlayerName);
++		
++		fakePlayer.setTitle("");
++		
++		fakePlayer.setAccessLevel(Config.DEFAULT_ACCESS_LEVEL);
++		
++		// Coordinates 45350, 49530-50283, -3064, radius 276-753
++		fakePlayer.getPosition().set(45350, 50283, -3056, 0);
++		
++		fakePlayer.spawnMe();
++		
++		Random rndX = new Random(), rndY = new Random();
++		boolean c1, c2;
++		do
++		{
++			// fakePlayer.teleportTo(45350, 49530, -3064, rs.getInt("heading"));
++			fakePlayer.getPosition().set(45350, 49530, -3056, 0);
++			int newX = 45350, newY = 49530, counter = 0;
++			do
++			{
++				if (counter++ > 5)
++				{
++					newX = 45350;
++					newY = 49530;
++					counter = 0;
++				}
++				newX += rndX.nextInt(1500) - 750;
++				newY += rndY.nextInt(1500) - 750;
++				c1 = fakePlayer.isIn2DRadius(new Location(newX, newY, -3064), 750);
++				c2 = fakePlayer.isIn2DRadius(new Location(newX, newY, -3064), 276);
++			}
++			while (!c1 || c2);
++			// fakePlayer.teleportTo(newX, newY, -3064, rs.getInt("heading"));
++			fakePlayer.getPosition().set(newX, newY, -3064, 0);
++		}
++		while (findAllNearbyObjects(fakePlayer, 50));
++		
++		fakePlayer.onPlayerEnter();
++		
++		fakePlayer.setOnlineStatus(true, false);
++		
++		fakePlayer.getStatus().setLevel(19);
++		
++		fakePlayer.getStatus().setMp(fakePlayer.getStatus().getMaxMp());
++		
++		try
++		{
++			final String clanName = "TradeEmpire";
++			final long cet = fakePlayer.getClanCreateExpiryTime();
++			
++			fakePlayer.setClanCreateExpiryTime(0);
++			
++			Clan clan = ClanTable.getInstance().getClanByName(clanName);
++			if (clan == null)
++			{
++				clan = ClanTable.getInstance().createClan(fakePlayer, clanName);
++				if (clan != null)
++					LOGGER.info("Clan " + clanName + " has been created. Clan leader is " + fakePlayer.getName() + ".");
++				else
++				{
++					fakePlayer.setClanCreateExpiryTime(cet);
++					LOGGER.info("There was a problem while creating the clan.");
++				}
++			}
++			else
++			{
++				fakePlayer.setClan(clan);
++				clan.addClanMember(fakePlayer);
++				fakePlayer.sendPacket(new UserInfo(fakePlayer));
++				fakePlayer.sendPacket(new PledgeShowMemberListAdd(fakePlayer));
++				// // Save player clan info to database
++				// //fakePlayer.store();
++			}
++		}
++		catch (Exception e)
++		{
++			LOGGER.info("Invalid string parameter for //pledge create.");
++		}
++		
++		int storeType = rnd.nextInt(2) == 1 ? 1 : 3;// , traderID = rs.getInt("id");
++		
++		if (storeType == 5)
++		{
++			grantCraftSkills(fakePlayer, 9); // lvl 2 for no grades
++		}
++		
++		fakePlayer.setOperateType(OperateType.values()[storeType]);
++		
++		TradeList tradeList = null;
++		ManufactureList manufactureList = null;
++		if (storeType == 1)
++		{
++			tradeList = fakePlayer.getSellList();
++		}
++		else if (storeType == 3)
++		{
++			tradeList = fakePlayer.getBuyList();
++		}
++		else if (storeType == 5)
++		{
++			manufactureList = fakePlayer.getManufactureList();
++		}
++		
++		// getRandomDGradeItemId
++		int j = rnd.nextInt(4);
++		for (int i = 0; i <= j; i++)
++		{
++			int rndItem = getRandomDGradeItemId();
++			Item itemTemplate = ItemData.getInstance().getTemplate(rndItem);
++			
++			genFakeTraderItems(fakePlayer, rndItem, itemTemplate.getReferencePrice(), storeType, tradeList, manufactureList);
++		}
++		
++		fakePlayer.getInventory().restore();
++		
++		// fakePlayer.getInventory().equipItemAndRecord(itemInst);
++		
++		// LOGGER.info("Trade bot " + fakePlayerName + " has in inventory: " + fakePlayer.getInventory().getItems());
++		
++		if (storeType == 1)
++		{
++			fakePlayer.getSellList().setTitle("WTS " + tradeList.get(rnd.nextInt(tradeList.size())).getItem().getName());
++			fakePlayer.getSellList().updateItems(false);
++		}
++		else if (storeType == 3)
++		{
++			fakePlayer.getBuyList().setTitle("WTB " + tradeList.get(rnd.nextInt(tradeList.size())).getItem().getName());
++			fakePlayer.getBuyList().updateItems(true);
++		}
++		else if (storeType == 5)
++		{
++			ManufactureList storeList = fakePlayer.getManufactureList();
++			storeList.setStoreName("Create D grade");
++		}
++		
++		// Force the offline/sitting posture
++		fakePlayer.sitDown();
++		
++		// Force the server to broadcast the player's presence and store sign
++		fakePlayer.broadcastUserInfo();
++		
++		fakePlayer.sendInfo(fakePlayer);
++		fakePlayer.getAI().notifyEvent(AiEventType.SAT_DOWN, null, null);
++		
 +	}
 +	
 +	public void spawnFakeBots(Player player) throws Exception
@@ -368,57 +723,39 @@ index 00000000..a1bf83c9
 +		fakePlayer.setRunning(true);
 +		
 +		// give some equipment
-+		ItemInstance itemInst, itemInst2, itemInst3, itemInst4;
 +		if (fakePlayer.isMageClass())
 +		{
-+			itemInst = ItemInstance.create(1101, 1); // Tunic of Devotion
-+			fakePlayer.getInventory().addItem(itemInst);
-+			itemInst2 = ItemInstance.create(1104, 1); // Stockings of Devotion
-+			fakePlayer.getInventory().addItem(itemInst2);
-+			itemInst3 = ItemInstance.create(44, 1); // Leather Helmet
-+			fakePlayer.getInventory().addItem(itemInst3);
-+			itemInst4 = ItemInstance.create(7816, 1); // Apprentice Adventurer's Staff
-+			fakePlayer.getInventory().addItem(itemInst4);
++			addAndEquip(fakePlayer, 1101); // Tunic of Devotion
++			addAndEquip(fakePlayer, 1104); // Stockings of Devotion
++			addAndEquip(fakePlayer, 44); // Leather Helmet
++			addAndEquip(fakePlayer, 7816); // Apprentice Adventurer's Staff
 +		}
 +		else
 +		{
-+			itemInst = ItemInstance.create(23, 1); // Wooden Breastplate
-+			fakePlayer.getInventory().addItem(itemInst);
-+			itemInst2 = ItemInstance.create(43, 1); // Wooden Helmet
-+			fakePlayer.getInventory().addItem(itemInst2);
-+			itemInst3 = ItemInstance.create(2386, 1); // Wooden Gaiters
-+			fakePlayer.getInventory().addItem(itemInst3);
-+			itemInst4 = ItemInstance.create(7821, 1); // Apprentice Adventurer's Long Sword
-+			fakePlayer.getInventory().addItem(itemInst4);
++			addAndEquip(fakePlayer, 23); // Wooden Breastplate
++			addAndEquip(fakePlayer, 43); // Wooden Helmet
++			addAndEquip(fakePlayer, 2386); // Wooden Gaiters
++			addAndEquip(fakePlayer, 7821); // Apprentice Adventurer's Long Sword
 +		}
 +		
-+		ItemInstance itemInst4b = ItemInstance.create(51, 1);// Bracer
-+		fakePlayer.getInventory().addItem(itemInst4b);
-+		ItemInstance itemInst4c = ItemInstance.create(39, 1);// Boots
-+		fakePlayer.getInventory().addItem(itemInst4c);
++		addAndEquip(fakePlayer, 51); // Bracer
++		addAndEquip(fakePlayer, 39); // Boots
 +		
-+		ItemInstance itemInst5;
++		ItemInstance itemInstShots;
 +		if (fakePlayer.isMageClass())
 +		{
-+			itemInst5 = ItemInstance.create(5790, 5000);// Spiritshot: No grade for beginners
-+			fakePlayer.getInventory().addItem(itemInst5); // 2509,3000); Spiritshot: No grade
++			itemInstShots = ItemInstance.create(5790, 5000);// Spiritshot: No grade for beginners
++			fakePlayer.getInventory().addItem(itemInstShots); // 2509,3000); Spiritshot: No grade
 +		}
 +		else
 +		{
-+			itemInst5 = ItemInstance.create(5789, 5000);// Soulshot: No grade for beginners
-+			fakePlayer.getInventory().addItem(itemInst5); // 1835,3000); Soulshot: No grade
++			itemInstShots = ItemInstance.create(5789, 5000);// Soulshot: No grade for beginners
++			fakePlayer.getInventory().addItem(itemInstShots); // 1835,3000); Soulshot: No grade
 +		}
-+		ItemInstance itemInst6 = ItemInstance.create(1539, 150);// Greater Healing potion
-+		fakePlayer.getInventory().addItem(itemInst6);
++		ItemInstance itemInstHP = ItemInstance.create(1539, 150);// Greater Healing potion
++		fakePlayer.getInventory().addItem(itemInstHP);
 +		
 +		fakePlayer.getInventory().restore();
-+		
-+		fakePlayer.getInventory().equipItemAndRecord(itemInst);
-+		fakePlayer.getInventory().equipItemAndRecord(itemInst2);
-+		fakePlayer.getInventory().equipItemAndRecord(itemInst3);
-+		fakePlayer.getInventory().equipItemAndRecord(itemInst4);
-+		fakePlayer.getInventory().equipItemAndRecord(itemInst4b);
-+		fakePlayer.getInventory().equipItemAndRecord(itemInst4c);
 +		
 +		// Force the server to broadcast the player's presence and store sign
 +		fakePlayer.broadcastUserInfo();
@@ -431,7 +768,14 @@ index 00000000..a1bf83c9
 +		
 +	}
 +	
-+	private static void spawnDummyFakeClanLeaders(String name, int lvl, int castleID) throws Exception
++	private static void addAndEquip(Player bot, int itemId)
++	{
++		ItemInstance itemInst = ItemInstance.create(itemId, 1);
++		bot.getInventory().addItem(itemInst);
++		bot.getInventory().equipItemAndRecord(itemInst);
++	}
++	
++	private static void spawnDummyFakeClanLeaders(String name, int lvl, int castleID)
 +	{
 +		int classId = 18;
 +		PlayerTemplate template = PlayerData.getInstance().getTemplate(classId);
@@ -507,7 +851,7 @@ index 00000000..a1bf83c9
 +		// fakePlayer.getAI().notifyEvent(AiEventType.SAT_DOWN, null, null);
 +	}
 +	
-+	private void spawnFakeTrader(ResultSet rs) throws Exception
++	private void spawnFakeTraderDB(ResultSet rs) throws Exception
 +	{
 +		int classId = rs.getInt("class_id");
 +		PlayerTemplate template = PlayerData.getInstance().getTemplate(classId);
@@ -526,8 +870,37 @@ index 00000000..a1bf83c9
 +		
 +		fakePlayer.setAccessLevel(Config.DEFAULT_ACCESS_LEVEL);
 +		
-+		// Coordinates
++		// Coordinates 45350, 49530-50283, -3064, radius 276-753
 +		fakePlayer.getPosition().set(rs.getInt("x"), rs.getInt("y"), rs.getInt("z"), rs.getInt("heading"));
++		// fakePlayer.getPosition().set(45350, 50283, -3064, rs.getInt("heading"));
++		
++		fakePlayer.spawnMe();
++		
++		// Random rndX = new Random(), rndY = new Random();
++		// boolean c1, c2;
++		// do {
++		// //fakePlayer.teleportTo(45350, 49530, -3064, rs.getInt("heading"));
++		// fakePlayer.getPosition().set(45350, 49530, -3064, rs.getInt("heading"));
++		// int newX = 45350, newY = 49530, counter = 0;
++		// do {
++		// if(counter++>5) {
++		// newX = 45350;
++		// newY = 49530;
++		// counter = 0;
++		// }
++		// newX+=rndX.nextInt(1500)-750;
++		// newY+=rndY.nextInt(1500)-750;
++		// c1 = fakePlayer.isIn2DRadius(new Location(newX, newY, -3064), 750);
++		// c2 = fakePlayer.isIn2DRadius(new Location(newX, newY, -3064), 276);
++		// } while (!c1 || c2);
++		// //fakePlayer.teleportTo(newX, newY, -3064, rs.getInt("heading"));
++		// fakePlayer.getPosition().set(newX, newY, -3064, rs.getInt("heading"));
++		// //fakePlayer.teleportTo(newX, newY, -3064, rs.getInt("heading"));
++		// } while(findAllNearbyObjects(fakePlayer, 50));
++		
++		fakePlayer.onPlayerEnter();
++		
++		fakePlayer.setOnlineStatus(true, false);
 +		
 +		fakePlayer.getStatus().setLevel(rs.getByte("level"));
 +		
@@ -545,7 +918,7 @@ index 00000000..a1bf83c9
 +			{
 +				clan = ClanTable.getInstance().createClan(fakePlayer, clanName);
 +				if (clan != null)
-+					LOGGER.info("Clan " + clanName + " have been created. Clan leader is " + fakePlayer.getName() + ".");
++					LOGGER.info("Clan " + clanName + " has been created. Clan leader is " + fakePlayer.getName() + ".");
 +				else
 +				{
 +					fakePlayer.setClanCreateExpiryTime(cet);
@@ -566,12 +939,6 @@ index 00000000..a1bf83c9
 +		{
 +			LOGGER.info("Invalid string parameter for //pledge create.");
 +		}
-+		
-+		// Spawn into the game world
-+		fakePlayer.spawnMe();
-+		fakePlayer.onPlayerEnter();
-+		
-+		fakePlayer.setOnlineStatus(true, false);
 +		
 +		int storeType = rs.getInt("store_type"), traderID = rs.getInt("id");
 +		
@@ -600,7 +967,7 @@ index 00000000..a1bf83c9
 +		}
 +		
 +		try (Connection con = ConnectionPool.getConnection();
-+			PreparedStatement ps = con.prepareStatement("SELECT * FROM fake_trader_items WHERE trader_id = ?"))
++			PreparedStatement ps = con.prepareStatement("SELECT * FROM fake_traders_items WHERE trader_id = ?"))
 +		{
 +			ps.setInt(1, traderID);
 +			ResultSet rs2 = ps.executeQuery();
@@ -644,7 +1011,40 @@ index 00000000..a1bf83c9
 +		fakePlayer.broadcastUserInfo();
 +		
 +		fakePlayer.sendInfo(fakePlayer);
-+		// fakePlayer.getAI().notifyEvent(AiEventType.SAT_DOWN, null, null);
++		fakePlayer.getAI().notifyEvent(AiEventType.SAT_DOWN, null, null);
++	}
++	
++	private static boolean findAllNearbyObjects(Player bot, int range)
++	{
++		return (bot.getKnownTypeInRadius(WorldObject.class, range).size() > 0);
++	}
++	
++	private static void genFakeTraderItems(Player fakePlayer, int itemId, int price, int storeType, TradeList tradeList, ManufactureList manufactureList)
++	{
++		int count = 1;
++		
++		ItemInstance itemInst = ItemInstance.create(itemId, count); // Composition Bow
++		fakePlayer.getInventory().addItem(itemInst);
++		
++		if (storeType == 3)
++		{
++			ItemInstance itemInst2 = ItemInstance.create(57, count * price);// add some adena, for buyers only!!!
++			fakePlayer.getInventory().addItem(itemInst2);
++		}
++		
++		if (storeType == 5)
++		{
++			Recipe recipe = RecipeData.getInstance().getRecipeByItemId(itemInst.getItemId());
++			// putRecipe(Recipe recipe, boolean isDwarven, boolean saveOnDb)
++			fakePlayer.getRecipeBook().putRecipe(recipe, true, false);
++			manufactureList.add(new ManufactureItem(RecipeData.getInstance().getRecipeByItemId(itemId).id(), price, true));
++			// LOGGER.info(" recipe: "+RecipeData.getInstance().getRecipeByItemId(itemId).id());
++		}
++		else
++		{
++			tradeList.add(new TradeItem(itemInst, count, price));
++		}
++		
 +	}
 +	
 +	private static void readFakeTraderItemsDB(Player fakePlayer, ResultSet rs, int storeType, TradeList tradeList, ManufactureList manufactureList) throws Exception

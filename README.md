@@ -58,6 +58,12 @@ GRANT ALL PRIVILEGES ON l2aCismoddb.* TO 'l2database'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
 ```
+After that apply all sql scripts:
+```
+cd ~/L2aCisMod/sql
+cat *.sql > all.sql
+sudo mariadb -u l2database -p l2aCismoddb < all.sql
+```
 Than modify ~/L2aCisMod/gameserver/config/server.properties
 In the section "Database informations", put this:
 ```
@@ -85,6 +91,14 @@ You can see the login/ and gameserver/logs server directories, if there are any 
 * Connect with Interlude client, which connects to localhost, 127.0.0.1
 
 **Release notes**
+
+**L2aCis409botMod v0.02**
+* Random fake player shops have been added to Elven village. (just Buy & Sell)
+  Fake players have random names, from gameserver/data/fake_names.txt
+  They sell only D-grade equipment at the moment.
+* You need to recompile whole project if so, so the changes take effect.
+  Including database, "sudo mariadb" and "than drop database l2aCismoddb;"
+  And re-create it again with the new patch applied.
 
 **L2aCis409botMod v0.01**
 * You can spawn bots using admin command: //spawnbot
