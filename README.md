@@ -1,6 +1,8 @@
 # L2aCis409botMod
 Lineage 2 aCis 409 modified java server with Fake Players, Traders &amp; bots.
 
+<img width="1440" height="834" alt="Example" src="https://github.com/user-attachments/assets/f4a6ed87-f9ca-4106-8111-7aec4110c5e7" />
+
 **Usage example:**
 
 Patch the aCis 409 repository with given patch.diff.
