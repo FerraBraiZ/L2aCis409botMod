@@ -5,12 +5,12 @@ You are using this software at your own risk. Author does not bear any responsib
 Version notes:
 
 L2aCis409botMod v0.02
-* Random fake player shops have been added to Elven village. (just Buy & Sell)
+* Random fake player shops have been added to Elven village. (just Buy & Sell).
   Fake players have random names, from gameserver/data/fake_names.txt
   They sell only D-grade equipment at the moment.
 * You need to recompile whole project if so, so the changes take effect.
-  Including database, "sudo mariadb" and "than drop database l2aCismoddb;"
-  And re-create it again with the new patch applied.
+  Including database, "sudo mariadb" and than "drop database l2aCismoddb;"
+  And re-create it again with the new patch.diff applied.
 
 L2aCis409botMod v0.01
 * Initial release
