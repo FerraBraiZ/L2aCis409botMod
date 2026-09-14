@@ -1,9 +1,9 @@
 diff --git a/aCis_datapack/data/fake_names.txt b/aCis_datapack/data/fake_names.txt
 new file mode 100644
-index 00000000..83e98de0
+index 00000000..5bb3ced9
 --- /dev/null
 +++ b/aCis_datapack/data/fake_names.txt
-@@ -0,0 +1,171 @@
+@@ -0,0 +1,174 @@
 +SnowyLeopard
 +Crescent
 +Horizon
@@ -175,6 +175,9 @@ index 00000000..83e98de0
 +Scolopax
 +Gallinago
 +Phalaropus
++Curlews
++Numenius
++Onyx
 diff --git a/aCis_datapack/data/xml/adminCommands.xml b/aCis_datapack/data/xml/adminCommands.xml
 index 0021f33a..3c12dfd4 100644
 --- a/aCis_datapack/data/xml/adminCommands.xml
@@ -309,10 +312,10 @@ index 0015929e..fb8f3064 100644
 +
 diff --git a/aCis_datapack/sql/fake_traders.sql b/aCis_datapack/sql/fake_traders.sql
 new file mode 100644
-index 00000000..da06f04a
+index 00000000..2bb19abb
 --- /dev/null
 +++ b/aCis_datapack/sql/fake_traders.sql
-@@ -0,0 +1,24 @@
+@@ -0,0 +1,23 @@
 +CREATE TABLE IF NOT EXISTS `fake_traders` (
 +  `id` INT NOT NULL AUTO_INCREMENT,
 +  `name` VARCHAR(35) NOT NULL,
@@ -322,7 +325,6 @@ index 00000000..da06f04a
 +  `hairStyle` TINYINT UNSIGNED DEFAULT NULL,
 +  `hairColor` TINYINT UNSIGNED DEFAULT NULL,
 +  `sex` TINYINT UNSIGNED DEFAULT 0,
-+  `race` TINYINT UNSIGNED DEFAULT NULL,
 +  `x` INT NOT NULL,
 +  `y` INT NOT NULL,
 +  `z` INT NOT NULL,
@@ -333,13 +335,13 @@ index 00000000..da06f04a
 +  `clanName` VARCHAR(16) DEFAULT '',
 +  PRIMARY KEY (`id`)
 +);
-+INSERT INTO `fake_traders` (`id`, `name`, `class_id`, `face`, `hairStyle`, `hairColor`, `sex`, `race`, `x`, `y`, `z`, `heading`, `store_type`, `store_msg`, `level`, `clanName`) VALUES
-+(1, 'KyrieElei', 18, 0, 1, 0, 0, 1, 45472, 48283, -3056, 0, 1, 'WTS Top NG weapons, Dx', 18, 'KyrieElei'),
-+(2, 'Keturah', 18, 0, 1, 0, 1, 1, 45549, 48313, -3056, 0, 3, 'WTB mats', 18, 'TradeEmpire'),
-+(3, 'Bobika', 53, 0, 1, 0, 1, 4, 45381, 48288, -3056, 0, 5, 'crafting D shots', 18, 'TradeEmpire');
++INSERT INTO `fake_traders` (`id`, `name`, `class_id`, `face`, `hairStyle`, `hairColor`, `sex`, `x`, `y`, `z`, `heading`, `store_type`, `store_msg`, `level`, `clanName`) VALUES
++(1, 'KyrieElei', 18, 0, 1, 0, 0, 45472, 48283, -3056, 0, 1, 'WTS Top NG weapons, Dx', 18, 'KyrieElei'),
++(2, 'Keturah', 18, 0, 1, 0, 1, 45549, 48313, -3056, 0, 3, 'WTB mats', 18, 'TradeEmpire'),
++(3, 'Bobika', 53, 0, 1, 0, 1, 45381, 48288, -3056, 0, 5, 'crafting D shots', 18, 'TradeEmpire');
 diff --git a/aCis_datapack/sql/fake_traders_items.sql b/aCis_datapack/sql/fake_traders_items.sql
 new file mode 100644
-index 00000000..2750c688
+index 00000000..aed86c4a
 --- /dev/null
 +++ b/aCis_datapack/sql/fake_traders_items.sql
 @@ -0,0 +1,19 @@
@@ -350,7 +352,7 @@ index 00000000..2750c688
 +  `price` BIGINT NOT NULL,
 +  FOREIGN KEY (`trader_id`) REFERENCES `fake_traders`(`id`) ON DELETE CASCADE
 +);
-+INSERT INTO `fake_trader_items` (`trader_id`, `item_id`, `count`, `price`) VALUES
++INSERT INTO `fake_traders_items` (`trader_id`, `item_id`, `count`, `price`) VALUES
 +(1, 273, 1, 270000),   -- Composition Bow
 +(1, 68, 1, 270000),    -- Falchion
 +(1, 16, 1, 270000),    -- Long Spear
@@ -534,10 +536,10 @@ index 00000000..452b03d6
 +}
 diff --git a/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeTraderManager.java b/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeTraderManager.java
 new file mode 100644
-index 00000000..729888da
+index 00000000..dd43dda5
 --- /dev/null
 +++ b/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeTraderManager.java
-@@ -0,0 +1,739 @@
+@@ -0,0 +1,925 @@
 +package net.sf.l2j.gameserver.data.manager;
 +
 +import java.sql.Connection;
@@ -554,7 +556,10 @@ index 00000000..729888da
 +import net.sf.l2j.gameserver.enums.AiEventType;
 +import net.sf.l2j.gameserver.enums.actors.OperateType;
 +import net.sf.l2j.gameserver.enums.actors.Sex;
++import net.sf.l2j.gameserver.enums.items.ArmorType;
 +import net.sf.l2j.gameserver.enums.items.CrystalType;
++import net.sf.l2j.gameserver.enums.items.EtcItemType;
++import net.sf.l2j.gameserver.enums.items.WeaponType;
 +import net.sf.l2j.gameserver.model.actor.container.player.Appearance;
 +import net.sf.l2j.gameserver.model.trade.TradeList;
 +import net.sf.l2j.gameserver.model.trade.TradeItem;
@@ -572,14 +577,19 @@ index 00000000..729888da
 +import net.sf.l2j.gameserver.data.xml.ItemData;
 +
 +import java.util.ArrayList;
++import java.util.Arrays;
 +import java.util.List;
 +import net.sf.l2j.gameserver.model.residence.castle.Castle;
 +import java.util.Random;
 +
 +import net.sf.l2j.gameserver.model.actor.instance.FakePlayerAI;
 +import net.sf.l2j.gameserver.model.craft.ManufactureList;
++import net.sf.l2j.gameserver.model.holder.IntIntHolder;
 +import net.sf.l2j.gameserver.model.item.instance.ItemInstance;
++import net.sf.l2j.gameserver.model.item.kind.Armor;
++import net.sf.l2j.gameserver.model.item.kind.EtcItem;
 +import net.sf.l2j.gameserver.model.item.kind.Item;
++import net.sf.l2j.gameserver.model.item.kind.Weapon;
 +import net.sf.l2j.gameserver.data.xml.RecipeData;
 +import net.sf.l2j.gameserver.model.records.Recipe;
 +import net.sf.l2j.gameserver.skills.L2Skill;
@@ -589,10 +599,21 @@ index 00000000..729888da
 +
 +public class FakeTraderManager
 +{
++	private static boolean[] BANNED_MONSTER_ITEMS = new boolean[9299];
++	
++	private static float[] REFFERENCE_PRICE_MULTIPLYER =
++	{
++		1.1f,
++		1.15f,
++		1.20f,
++		1.25f
++	};
++	
 +	private static final CLogger LOGGER = new CLogger(FakeTraderManager.class.getName());
 +	
 +	private static final List<BotClan> _botClans = BotClanData.getInstance().getBotClans();
 +	
++	private static final List<Integer> NO_GRADE_ITEM_IDS = new ArrayList<>();
 +	private static final List<Integer> D_GRADE_ITEM_IDS = new ArrayList<>();
 +	
 +	public static final FakeTraderManager getInstance()
@@ -602,7 +623,9 @@ index 00000000..729888da
 +	
 +	public void load()
 +	{
++		loadNGradeItems();
 +		loadDGradeItems();
++		excludeMonsterItems();
 +		
 +		for (BotClan clan : _botClans)
 +		{
@@ -637,6 +660,64 @@ index 00000000..729888da
 +		
 +	}
 +	
++	public static void excludeMonsterItems()
++	{
++		BANNED_MONSTER_ITEMS[250] = true;  // Dark Mystic Fist
++		BANNED_MONSTER_ITEMS[6720] = true; // Monster Only(Shadow of Halisha)
++		BANNED_MONSTER_ITEMS[6919] = true; // Monster Only (Shield of Ketra Orc)
++		
++		BANNED_MONSTER_ITEMS[749] = true; // 0
++		BANNED_MONSTER_ITEMS[1471] = true; // Silenos Blowgun
++		BANNED_MONSTER_ITEMS[1472] = true; // Dreadbane
++		BANNED_MONSTER_ITEMS[3937] = true; // Giant Bar
++		BANNED_MONSTER_ITEMS[3938] = true; // Giant Rod
++		BANNED_MONSTER_ITEMS[3939] = true; // Lady's Fan
++		BANNED_MONSTER_ITEMS[4028] = true; // Giant Cannon
++		BANNED_MONSTER_ITEMS[5128] = true; // Crokian Blade
++		BANNED_MONSTER_ITEMS[5127] = true; // Dailaon Knife
++		BANNED_MONSTER_ITEMS[5129] = true; // Doll Knife
++		BANNED_MONSTER_ITEMS[5130] = true; // Nos Sword
++		BANNED_MONSTER_ITEMS[5131] = true; // Parhit Staff
++		BANNED_MONSTER_ITEMS[5132] = true; // Giant Trident
++		BANNED_MONSTER_ITEMS[5791] = true; // Tomb Guard A
++		BANNED_MONSTER_ITEMS[5792] = true; // Tomb Guard B
++		BANNED_MONSTER_ITEMS[5795] = true; // Tomb Guard A
++		BANNED_MONSTER_ITEMS[5796] = true; // Tomb Guard B
++		BANNED_MONSTER_ITEMS[5799] = true; // Nephilim Lord
++		BANNED_MONSTER_ITEMS[6723] = true; // Monster Only(Vampire Warrior)
++	}
++	
++	public static void loadNGradeItems()
++	{
++		NO_GRADE_ITEM_IDS.clear();
++		
++		// Loop through every item template registered in the aCis core XML engine
++		for (Item template : ItemData.getInstance().getTemplates())
++		{
++			if (template == null)
++				continue;
++			
++			// Check if the item is explicitly D-Grade
++			if (template.getCrystalType() == CrystalType.NONE)
++			{
++				// Optional: Filter out quest items, adena, or arrows if desired
++				if (template.isQuestItem())
++					continue;
++				
++				// Check if the item template is an EtcItem, then retrieve its type
++				if (template instanceof EtcItem && (((EtcItem) template).getItemType() == EtcItemType.SEED || ((EtcItem) template).getItemType() == EtcItemType.SEED2))
++				{
++					// Skip seeds from the fake bot shop
++					continue;
++				}
++				
++				NO_GRADE_ITEM_IDS.add(template.getItemId());
++			}
++		}
++		
++		LOGGER.info("DGradePicker: Cached " + D_GRADE_ITEM_IDS.size() + " D-Grade items.");
++	}
++	
 +	public static void loadDGradeItems()
 +	{
 +		D_GRADE_ITEM_IDS.clear();
@@ -659,6 +740,21 @@ index 00000000..729888da
 +		}
 +		
 +		LOGGER.info("DGradePicker: Cached " + D_GRADE_ITEM_IDS.size() + " D-Grade items.");
++	}
++	
++	/**
++	 * Picks a random D-Grade Item ID from the cached pool.
++	 * @return a valid item ID, or 0 if something went wrong or cache is empty.
++	 */
++	public static int getRandomNGradeItemId()
++	{
++		if (NO_GRADE_ITEM_IDS.isEmpty())
++		{
++			return 0; // Fallback or safety boundary check
++		}
++		
++		// Use the native aCis core Rnd manager to fetch a random index
++		return NO_GRADE_ITEM_IDS.get(Rnd.get(NO_GRADE_ITEM_IDS.size()));
 +	}
 +	
 +	/**
@@ -811,13 +907,107 @@ index 00000000..729888da
 +		}
 +		
 +		// getRandomDGradeItemId
-+		int j = rnd.nextInt(4);
-+		for (int i = 0; i <= j; i++)
++		int j = rnd.nextInt(4), recipeLevel = 1;
++		for (int rndItem, i = 0; i <= j; i++)
 +		{
-+			int rndItem = getRandomDGradeItemId();
-+			Item itemTemplate = ItemData.getInstance().getTemplate(rndItem);
++			int count = 1;// storeType == 3 ? itemTemplate.isStackable()?rnd.nextInt(1000):1:1;
 +			
-+			genFakeTraderItems(fakePlayer, rndItem, itemTemplate.getReferencePrice(), storeType, tradeList, manufactureList);
++			Item itemTemplate = null;
++			Recipe keyRecipe = null;
++			boolean isKeyMat = false, isHighGradeScroll = false;
++			do
++			{
++				rndItem = rnd.nextInt(2) == 1 ? getRandomNGradeItemId() : getRandomDGradeItemId();
++				
++				itemTemplate = ItemData.getInstance().getTemplate(rndItem);
++				count = storeType == 3 ? itemTemplate.isStackable() ? rnd.nextInt(1000) + 1 : 1 : 1;
++				// if ((rndItem >= 5132 && rndItem <= 5199) || (rndItem >= 6650 && rndItem <= 6690) || (rndItem >= 8900 && rndItem <= 9200))
++				// if (!(itemTemplate.getReferencePrice() == 0) && BANNED_MONSTER_ITEMS[rndItem] == false)
++				// LOGGER.info("BANNED_MONSTER_ITEMS[" + rndItem + "] = true; // " + itemTemplate.getName());
++				
++				if (itemTemplate.getItemType() == EtcItemType.RECIPE)
++				{
++					Recipe recipe = RecipeData.getInstance().getRecipeByItemId(rndItem);
++					
++					if (recipe != null)
++					{
++						// 2. Extract the parsed craft level requirements
++						recipeLevel = recipe.level();
++					}
++				}
++				
++				int k = 1;
++				isKeyMat = false;
++				if (itemTemplate.getItemType() == EtcItemType.MATERIAL)
++				{
++					count = rnd.nextInt(1000) + 1;
++					for (; k <= 871; k++)
++					{
++						keyRecipe = RecipeData.getInstance().getRecipeList(k);
++						for (IntIntHolder material : keyRecipe.materials())
++						{
++							if (material.getId() == rndItem)
++							{ // The item ID of the required material
++								isKeyMat = true;
++								break;
++							}
++						}
++						if (isKeyMat)
++						{
++							break;
++						}
++					}
++					
++					if (isKeyMat && keyRecipe.level() <= 4)
++					{
++						if (itemTemplate.getReferencePrice() > 1500)
++						{
++							count = rnd.nextInt(20) + 1;
++							// LOGGER.info("Is key mat[" + rndItem + "] keyRecipe.lvl: " + keyRecipe.level()+" : " + k + " "+keyRecipe.recipeId()+" price: "+ itemTemplate.getReferencePrice()+" "+itemTemplate.getName());
++						}
++					}
++					
++					isHighGradeScroll = false;
++					if (itemTemplate.getItemType() == EtcItemType.SCROLL || itemTemplate.getItemType() == EtcItemType.SCRL_ENCHANT_WP || itemTemplate.getItemType() == EtcItemType.BLESS_SCRL_ENCHANT_WP || itemTemplate.getItemType() == EtcItemType.SCRL_ENCHANT_AM || itemTemplate.getItemType() == EtcItemType.BLESS_SCRL_ENCHANT_AM)
++					{
++						String scrollName = itemTemplate.getName().toLowerCase();
++						
++						// Check if the scroll name mentions A-Grade or S-Grade
++						if (scrollName.contains("b-grade") || scrollName.contains("a-grade") || scrollName.contains("s-grade") || scrollName.contains("b grade") || scrollName.contains("a grade") || scrollName.contains("s grade"))
++						{
++							// Block the bot from listing high-grade scrolls
++							isHighGradeScroll = true;
++						}
++					}
++				}
++				
++			} // throw out shadow, monster items, high level keys etc., only B,A,S grade crystals allowed, 1458 - 1459
++			while (itemTemplate.getReferencePrice() == 0 || BANNED_MONSTER_ITEMS[rndItem] || (storeType == 3 && (itemTemplate instanceof Weapon || itemTemplate instanceof Armor)) || recipeLevel > 4 || (isKeyMat && keyRecipe.level() > 4) || isHighGradeScroll || (rndItem >= 1460 && rndItem <= 1462));
++			
++			if (itemTemplate.getItemType() == EtcItemType.RECIPE)
++				count = rnd.nextInt(10) + 1;
++			
++			if (itemTemplate.getItemType() == EtcItemType.CROP)
++				count = rnd.nextInt(800) + 1;
++			
++			if (itemTemplate.getItemType() == EtcItemType.POTION || itemTemplate.getItemType() == EtcItemType.ELIXIR)
++				count = rnd.nextInt(100) + 1;
++			
++			if (itemTemplate.getItemType() == EtcItemType.SHOT)
++				count = rnd.nextInt(5000) + 1;
++			
++			if (rndItem >= 1458 && rndItem <= 1459) // D, C Crystals
++				count = rnd.nextInt(5000) + 1;
++			
++			int price = itemTemplate.getReferencePrice();
++			if (storeType == 1)
++			{
++				price = (int) (REFFERENCE_PRICE_MULTIPLYER[rnd.nextInt(4)] * itemTemplate.getReferencePrice());
++				if (itemTemplate.getItemType() == EtcItemType.SCROLL || itemTemplate.getItemType() == EtcItemType.SCRL_ENCHANT_WP || itemTemplate.getItemType() == EtcItemType.BLESS_SCRL_ENCHANT_WP || itemTemplate.getItemType() == EtcItemType.SCRL_ENCHANT_AM || itemTemplate.getItemType() == EtcItemType.BLESS_SCRL_ENCHANT_AM)
++					price <<= 1;
++			}
++			
++			genFakeTraderItems(fakePlayer, rndItem, price, count, storeType, tradeList, manufactureList);
 +		}
 +		
 +		fakePlayer.getInventory().restore();
@@ -1196,10 +1386,8 @@ index 00000000..729888da
 +		return (bot.getKnownTypeInRadius(WorldObject.class, range).size() > 0);
 +	}
 +	
-+	private static void genFakeTraderItems(Player fakePlayer, int itemId, int price, int storeType, TradeList tradeList, ManufactureList manufactureList)
++	private static void genFakeTraderItems(Player fakePlayer, int itemId, int price, int count, int storeType, TradeList tradeList, ManufactureList manufactureList)
 +	{
-+		int count = 1;
-+		
 +		ItemInstance itemInst = ItemInstance.create(itemId, count); // Composition Bow
 +		fakePlayer.getInventory().addItem(itemInst);
 +		
