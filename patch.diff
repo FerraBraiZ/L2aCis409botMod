@@ -536,10 +536,10 @@ index 00000000..452b03d6
 +}
 diff --git a/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeTraderManager.java b/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeTraderManager.java
 new file mode 100644
-index 00000000..dd43dda5
+index 00000000..5fd04eb3
 --- /dev/null
 +++ b/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeTraderManager.java
-@@ -0,0 +1,925 @@
+@@ -0,0 +1,924 @@
 +package net.sf.l2j.gameserver.data.manager;
 +
 +import java.sql.Connection;
@@ -966,21 +966,20 @@ index 00000000..dd43dda5
 +							// LOGGER.info("Is key mat[" + rndItem + "] keyRecipe.lvl: " + keyRecipe.level()+" : " + k + " "+keyRecipe.recipeId()+" price: "+ itemTemplate.getReferencePrice()+" "+itemTemplate.getName());
 +						}
 +					}
-+					
-+					isHighGradeScroll = false;
-+					if (itemTemplate.getItemType() == EtcItemType.SCROLL || itemTemplate.getItemType() == EtcItemType.SCRL_ENCHANT_WP || itemTemplate.getItemType() == EtcItemType.BLESS_SCRL_ENCHANT_WP || itemTemplate.getItemType() == EtcItemType.SCRL_ENCHANT_AM || itemTemplate.getItemType() == EtcItemType.BLESS_SCRL_ENCHANT_AM)
-+					{
-+						String scrollName = itemTemplate.getName().toLowerCase();
-+						
-+						// Check if the scroll name mentions A-Grade or S-Grade
-+						if (scrollName.contains("b-grade") || scrollName.contains("a-grade") || scrollName.contains("s-grade") || scrollName.contains("b grade") || scrollName.contains("a grade") || scrollName.contains("s grade"))
-+						{
-+							// Block the bot from listing high-grade scrolls
-+							isHighGradeScroll = true;
-+						}
-+					}
 +				}
 +				
++				isHighGradeScroll = false;
++				if (itemTemplate.getItemType() == EtcItemType.SCROLL || itemTemplate.getItemType() == EtcItemType.SCRL_ENCHANT_WP || itemTemplate.getItemType() == EtcItemType.BLESS_SCRL_ENCHANT_WP || itemTemplate.getItemType() == EtcItemType.SCRL_ENCHANT_AM || itemTemplate.getItemType() == EtcItemType.BLESS_SCRL_ENCHANT_AM)
++				{
++					String scrollName = itemTemplate.getName().toLowerCase();
++					
++					// Check if the scroll name mentions A-Grade or S-Grade
++					if (scrollName.contains("b-grade") || scrollName.contains("a-grade") || scrollName.contains("s-grade") || scrollName.contains("b grade") || scrollName.contains("a grade") || scrollName.contains("s grade"))
++					{
++						// Block the bot from listing high-grade scrolls
++						isHighGradeScroll = true;
++					}
++				}
 +			} // throw out shadow, monster items, high level keys etc., only B,A,S grade crystals allowed, 1458 - 1459
 +			while (itemTemplate.getReferencePrice() == 0 || BANNED_MONSTER_ITEMS[rndItem] || (storeType == 3 && (itemTemplate instanceof Weapon || itemTemplate instanceof Armor)) || recipeLevel > 4 || (isKeyMat && keyRecipe.level() > 4) || isHighGradeScroll || (rndItem >= 1460 && rndItem <= 1462));
 +			
