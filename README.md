@@ -29,7 +29,7 @@ mkdir L2aCisMod
 cp -r ~/git/acis_public/aCis_gameserver/build/dist/ ~/L2aCisMod
 cp -r ~/git/acis_public/aCis_datapack/build/ ~/L2aCisMod
 ```
-* Than copy L2OFF Interlude geodata (can be found on the internet),
+* Than copy L2OFF Interlude geodata ([can be found on the internet](http://anothercrappyinterludeserver.com/files/geodata/)),
 into ~/L2aCisMod/gameserver/data/geodata directory.
 If you want to use L2J geodata, configure it in
 ~/L2aCisMod/gameserver/config/geoengine.properties Set: GeoDataType = L2J
