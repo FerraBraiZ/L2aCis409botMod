@@ -65,7 +65,7 @@ cat *.sql > all.sql
 sudo mariadb -u l2database -p l2aCismoddb < all.sql
 ```
 Than modify ~/L2aCisMod/gameserver/config/server.properties
-In the section "Database informations", put this:
+In the section "Database informations", put this (don't forget to change the pasword you set for l2database user):
 ```
 URL = jdbc:mariadb://localhost:3306/l2aCismoddb
 Login = l2database
