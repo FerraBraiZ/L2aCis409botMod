@@ -8,6 +8,9 @@ Lineage 2 aCis 409 modified java server with Fake Players, Traders &amp; bots.
 Patch the aCis 409 repository with given patch.diff.
 First clone the aCis 409 repository and than copy the patch.diff 
 file into the root of your repository and apply patch.diff:
+
+**Guide on Linux:**
+
 ```
 cd ~
 mkdir git
@@ -19,7 +22,6 @@ git apply patch.diff
 
 * Than build the source as normally. i.e. through Eclipse Ant build.xml (import the project first).
 Both projects aCis_datapack and aCis_gameserver have to be build.
-Guide on Linux:
 Copy the build files into ~/L2aCisMod/ directory.
 ```
 cd ~
