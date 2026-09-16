@@ -341,7 +341,7 @@ index 00000000..2bb19abb
 +(3, 'Bobika', 53, 0, 1, 0, 1, 45381, 48288, -3056, 0, 5, 'crafting D shots', 18, 'TradeEmpire');
 diff --git a/aCis_datapack/sql/fake_traders_items.sql b/aCis_datapack/sql/fake_traders_items.sql
 new file mode 100644
-index 00000000..aed86c4a
+index 00000000..e4970166
 --- /dev/null
 +++ b/aCis_datapack/sql/fake_traders_items.sql
 @@ -0,0 +1,19 @@
@@ -363,7 +363,7 @@ index 00000000..aed86c4a
 +(2, 1876, 100, 11000), -- Mithril Ore
 +(3, 1804, 1, 20),      -- Recipe: Soulshot: D-grade
 +(3, 3032, 1, 30),      -- Recipe: Spiritshot D
-+(3, 3953, 1, 70);      -- Recipe: Spiritshot D
++(3, 3953, 1, 70);      -- Recipe: Blessed Spiritshot D
 diff --git a/aCis_gameserver/config/server.properties b/aCis_gameserver/config/server.properties
 index d3985051..a557133e 100644
 --- a/aCis_gameserver/config/server.properties
@@ -385,7 +385,7 @@ index d3985051..a557133e 100644
 \ No newline at end of file
 +ShowServerNews = False
 diff --git a/aCis_gameserver/java/net/sf/l2j/gameserver/GameServer.java b/aCis_gameserver/java/net/sf/l2j/gameserver/GameServer.java
-index bf24b43b..450f7bc8 100644
+index bf24b43b..a74edd0e 100644
 --- a/aCis_gameserver/java/net/sf/l2j/gameserver/GameServer.java
 +++ b/aCis_gameserver/java/net/sf/l2j/gameserver/GameServer.java
 @@ -28,6 +28,8 @@ import net.sf.l2j.gameserver.data.manager.ClanHallManager;
@@ -410,7 +410,7 @@ index bf24b43b..450f7bc8 100644
  		CastleManager.getInstance().spawnEntities();
  		
 +		ServerMetricsManager.getInstance();
-+		LOGGER.info("Total adena picked per server: " + ServerMetricsManager.getTotalAdenaDropped()/*TOTAL_ADENA_DROP_PER_SERVER*/);
++		LOGGER.info("Total adena picked per server: " + ServerMetricsManager.getTotalAdenaDropped());
 +		
 +		FakeNameManager.getInstance().load();
 +		
@@ -536,10 +536,10 @@ index 00000000..452b03d6
 +}
 diff --git a/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeTraderManager.java b/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeTraderManager.java
 new file mode 100644
-index 00000000..acead902
+index 00000000..386bab72
 --- /dev/null
 +++ b/aCis_gameserver/java/net/sf/l2j/gameserver/data/manager/FakeTraderManager.java
-@@ -0,0 +1,934 @@
+@@ -0,0 +1,1041 @@
 +package net.sf.l2j.gameserver.data.manager;
 +
 +import java.sql.Connection;
@@ -556,10 +556,9 @@ index 00000000..acead902
 +import net.sf.l2j.gameserver.enums.AiEventType;
 +import net.sf.l2j.gameserver.enums.actors.OperateType;
 +import net.sf.l2j.gameserver.enums.actors.Sex;
-+import net.sf.l2j.gameserver.enums.items.ArmorType;
 +import net.sf.l2j.gameserver.enums.items.CrystalType;
 +import net.sf.l2j.gameserver.enums.items.EtcItemType;
-+import net.sf.l2j.gameserver.enums.items.WeaponType;
++import net.sf.l2j.gameserver.geoengine.GeoEngine;
 +import net.sf.l2j.gameserver.model.actor.container.player.Appearance;
 +import net.sf.l2j.gameserver.model.trade.TradeList;
 +import net.sf.l2j.gameserver.model.trade.TradeItem;
@@ -570,14 +569,13 @@ index 00000000..acead902
 +import net.sf.l2j.commons.logging.CLogger;
 +import net.sf.l2j.gameserver.data.sql.ClanTable;
 +import net.sf.l2j.gameserver.model.pledge.Clan;
-+import net.sf.l2j.gameserver.network.serverpackets.UserInfo;
 +import net.sf.l2j.gameserver.network.serverpackets.PledgeShowMemberListAdd;
++import net.sf.l2j.gameserver.network.serverpackets.PrivateStoreMsgSell;
 +import net.sf.l2j.gameserver.model.BotClan;
 +import net.sf.l2j.gameserver.data.xml.BotClanData;
 +import net.sf.l2j.gameserver.data.xml.ItemData;
 +
 +import java.util.ArrayList;
-+import java.util.Arrays;
 +import java.util.List;
 +import net.sf.l2j.gameserver.model.residence.castle.Castle;
 +import java.util.Random;
@@ -587,20 +585,21 @@ index 00000000..acead902
 +import net.sf.l2j.gameserver.model.holder.IntIntHolder;
 +import net.sf.l2j.gameserver.model.item.instance.ItemInstance;
 +import net.sf.l2j.gameserver.model.item.kind.Armor;
-+import net.sf.l2j.gameserver.model.item.kind.EtcItem;
 +import net.sf.l2j.gameserver.model.item.kind.Item;
 +import net.sf.l2j.gameserver.model.item.kind.Weapon;
-+import net.sf.l2j.gameserver.model.itemcontainer.Inventory;
 +import net.sf.l2j.gameserver.data.xml.RecipeData;
 +import net.sf.l2j.gameserver.model.records.Recipe;
 +import net.sf.l2j.gameserver.skills.L2Skill;
 +import net.sf.l2j.gameserver.data.SkillTable; // or SkillData depending on exact build
 +import net.sf.l2j.gameserver.model.location.Location;
-+import net.sf.l2j.gameserver.data.manager.FakeNameManager;
 +
 +public class FakeTraderManager
 +{
 +	private static boolean[] BANNED_MONSTER_ITEMS = new boolean[9299];
++	
++	private static boolean[] RARE_ITEMS = new boolean[9299];
++	
++	private static boolean[] SET_ITEMS = new boolean[9299];
 +	
 +	private static float[] REFFERENCE_PRICE_MULTIPLYER =
 +	{
@@ -627,6 +626,8 @@ index 00000000..acead902
 +		loadNGradeItems();
 +		loadDGradeItems();
 +		excludeMonsterItems();
++		logRareItems();
++		logSetItems();
 +		
 +		for (BotClan clan : _botClans)
 +		{
@@ -659,6 +660,66 @@ index 00000000..acead902
 +		}
 +		
 +	}
++	
++	public static void logSetItems()
++	{
++		SET_ITEMS[398] = true;  // Plated Leather
++		SET_ITEMS[418] = true;  // Plated Leather Gaiters
++		SET_ITEMS[1966] = true; // Plated Leather Fragment
++		SET_ITEMS[1967] = true; // Plated Leather Gaiters Material
++		SET_ITEMS[2411] = true; // Brigandine Helmet
++		SET_ITEMS[2414] = true; // Full Plate Helmet
++		SET_ITEMS[2424] = true; // Manticore Skin Boots
++		SET_ITEMS[2425] = true; // Brigandine Boots
++		SET_ITEMS[2431] = true; // Plated Leather Boots
++		SET_ITEMS[2436] = true; // Theca Leather Boots
++		SET_ITEMS[2449] = true; // Brigandine Gauntlets
++		SET_ITEMS[2454] = true; // Karmian Gloves
++		SET_ITEMS[2493] = true; // Brigandine Shield
++		SET_ITEMS[2497] = true; // Full Plate Shield
++		SET_ITEMS[2922] = true; // Brigandine Helmet Design
++		SET_ITEMS[2923] = true; // Manticore Skin Boot Lining
++		SET_ITEMS[2924] = true; // Brigandine Boots Design
++		SET_ITEMS[2927] = true; // Brigandine Gauntlets Pattern
++		SET_ITEMS[2929] = true; // Brigandine Shield Fragment
++		SET_ITEMS[2939] = true; // Plate Leather Boot Lining
++		SET_ITEMS[2944] = true; // Karmian Gloves Fabric
++		SET_ITEMS[2954] = true; // Theca Leather Boots Texture
++		SET_ITEMS[2959] = true; // Full Plate Helmet Design
++		SET_ITEMS[2966] = true; // Full Plate Shield Fragment
++	}
++	
++	public static void logRareItems()
++	{
++		RARE_ITEMS[3472] = true; // Blood Medusa
++		RARE_ITEMS[3473] = true; // Blood Werewolf
++		RARE_ITEMS[3474] = true; // Blood Basilisk
++		RARE_ITEMS[3475] = true; // Blood Drevanul
++		RARE_ITEMS[3476] = true; // Blood Succubus
++		RARE_ITEMS[3477] = true; // Blood Dragon
++		RARE_ITEMS[3478] = true; // Beleth's Blood Dragon
++		RARE_ITEMS[3479] = true; // Manak's Blood Werewolf
++		RARE_ITEMS[3480] = true; // Nia's Blood Medusa
++		RARE_ITEMS[3481] = true; // Gold Dragon
++		RARE_ITEMS[3482] = true; // Gold Wyvern
++		RARE_ITEMS[3483] = true; // Gold Knight
++		RARE_ITEMS[3484] = true; // Gold Giant
++		RARE_ITEMS[3485] = true; // Gold Drake
++		RARE_ITEMS[3486] = true; // Gold Wyrm
++		RARE_ITEMS[3487] = true; // Beleth's Gold Dragon
++		RARE_ITEMS[3488] = true; // Manak's Gold Giant
++		RARE_ITEMS[3489] = true; // Nia's Gold Wyvern
++		RARE_ITEMS[3490] = true; // Silver Unicorn
++		RARE_ITEMS[3491] = true; // Silver Fairy
++		RARE_ITEMS[3492] = true; // Silver Dryad
++		RARE_ITEMS[3493] = true; // Silver Dragon
++		RARE_ITEMS[3494] = true; // Silver Golem
++		RARE_ITEMS[3495] = true; // Silver Undine
++		RARE_ITEMS[3496] = true; // Beleth's Silver Dragon
++		RARE_ITEMS[3497] = true; // Manak's Silver Dryad
++		RARE_ITEMS[3498] = true; // Nia's Silver Fairy
++	}
++
 +	
 +	public static void excludeMonsterItems()
 +	{
@@ -776,7 +837,7 @@ index 00000000..acead902
 +	private void spawnRndFakeTrader(String locationd)
 +	{
 +		Random rnd = new Random();
-+		List<Integer> classIdList = List.of(0, 10, 18, 31, 44/* , 53 */);
++		List<Integer> classIdList = List.of(0, 10, 18, 31, 44 , 53);
 +		int classId = 18;
 +		
 +		// Always check if the list is empty first to avoid exceptions
@@ -788,12 +849,12 @@ index 00000000..acead902
 +			// Retrieve the item
 +			classId = classIdList.get(randomIndex);
 +		}
-+		
++		//classId = 18;		
 +		PlayerTemplate template = PlayerData.getInstance().getTemplate(classId);
 +		
 +		int objectId = IdFactory.getInstance().getNextId();
 +		
-+		// final Appearance app = new Appearance(rs.getByte("face"), rs.getByte("hairColor"), rs.getByte("hairStyle"), Sex.VALUES[rs.getByte("sex")]);
++		//final Appearance app = new Appearance((byte)0, (byte)0, (byte)1, Sex.MALE);
 +		final Appearance app = new Appearance((byte) rnd.nextInt(3), (byte) rnd.nextInt(4), (byte) rnd.nextInt(5), rnd.nextInt(2) == 1 ? Sex.MALE : Sex.FEMALE);
 +		
 +		Player fakePlayer = new Player(objectId, template, "", app);
@@ -837,7 +898,9 @@ index 00000000..acead902
 +			}
 +			while (!c1 || c2);
 +			// fakePlayer.teleportTo(newX, newY, -3064, rs.getInt("heading"));
-+			fakePlayer.getPosition().set(newX, newY, -3064, rnd.nextInt(65536));
++			
++			int absoluteZ = GeoEngine.getInstance().getHeight(newX, newY, -3064);
++			fakePlayer.getPosition().set(newX, newY, /*-3064*/absoluteZ, rnd.nextInt(65536));
 +		}
 +		while (findAllNearbyObjects(fakePlayer, 50));
 +		
@@ -874,8 +937,8 @@ index 00000000..acead902
 +				clan.addClanMember(fakePlayer);
 +				//fakePlayer.sendPacket(new UserInfo(fakePlayer));
 +				fakePlayer.sendPacket(new PledgeShowMemberListAdd(fakePlayer));
-+				// // Save player clan info to database
-+				// //fakePlayer.store();
++				// Save player clan info to database
++				// fakePlayer.store();
 +			}
 +		}
 +		catch (Exception e)
@@ -924,9 +987,8 @@ index 00000000..acead902
 +				
 +				itemTemplate = ItemData.getInstance().getTemplate(rndItem);
 +				count = storeType == 3 ? itemTemplate.isStackable() ? rnd.nextInt(1000) + 1 : 1 : 1;
-+				// if ((rndItem >= 5132 && rndItem <= 5199) || (rndItem >= 6650 && rndItem <= 6690) || (rndItem >= 8900 && rndItem <= 9200))
 +				// if (!(itemTemplate.getReferencePrice() == 0) && BANNED_MONSTER_ITEMS[rndItem] == false)
-+				// LOGGER.info("BANNED_MONSTER_ITEMS[" + rndItem + "] = true; // " + itemTemplate.getName());
++				// 	LOGGER.info("BANNED_MONSTER_ITEMS[" + rndItem + "] = true; // " + itemTemplate.getName());
 +				
 +				if (itemTemplate.getItemType() == EtcItemType.RECIPE)
 +				{
@@ -977,14 +1039,14 @@ index 00000000..acead902
 +					String scrollName = itemTemplate.getName().toLowerCase();
 +					
 +					// Check if the scroll name mentions A-Grade or S-Grade
-+					if (scrollName.contains("b-grade") || scrollName.contains("a-grade") || scrollName.contains("s-grade") || scrollName.contains("b grade") || scrollName.contains("a grade") || scrollName.contains("s grade"))
++					if (scrollName.contains("grade b") || scrollName.contains("grade a") || scrollName.contains("grade s") || scrollName.contains("b-grade") || scrollName.contains("a-grade") || scrollName.contains("s-grade") || scrollName.contains("b grade") || scrollName.contains("a grade") || scrollName.contains("s grade"))
 +					{
 +						// Block the bot from listing high-grade scrolls
 +						isHighGradeScroll = true;
 +					}
 +				}
 +			} // throw out shadow, monster items, high level keys etc., only B,A,S grade crystals allowed, 1458 - 1459
-+			while (itemTemplate.getReferencePrice() == 0 || BANNED_MONSTER_ITEMS[rndItem] || (storeType == 3 && (itemTemplate instanceof Weapon || itemTemplate instanceof Armor)) || recipeLevel > 4 || (isKeyMat && keyRecipe.level() > 4) || isHighGradeScroll || (rndItem >= 1460 && rndItem <= 1462));
++			while (itemTemplate.getReferencePrice() == 0 || BANNED_MONSTER_ITEMS[rndItem] || (storeType == 3 && (itemTemplate instanceof Weapon || itemTemplate instanceof Armor)) || recipeLevel > 4 || (isKeyMat && keyRecipe.level() > 4) || isHighGradeScroll || itemTemplate.getName().contains("(Not used)") || itemTemplate.getName().contains("Alternative") || (rndItem >= 1460 && rndItem <= 1462));
 +			
 +			if (itemTemplate.getItemType() == EtcItemType.RECIPE)
 +				count = rnd.nextInt(10) + 1;
@@ -998,10 +1060,29 @@ index 00000000..acead902
 +			if (itemTemplate.getItemType() == EtcItemType.SHOT)
 +				count = rnd.nextInt(5000) + 1;
 +			
++			if (RARE_ITEMS[rndItem])
++				count = rnd.nextInt(100) + 1;
++			
++			if (itemTemplate.getName().contains("Food"))
++				count = rnd.nextInt(1000) + 1;
++			
++			if (itemTemplate.getName().contains(" Fish"))
++				count = rnd.nextInt(100) + 1;
++			
++			if (itemTemplate.getName().contains("Scroll of Escape"))
++				count = rnd.nextInt(50) + 1;
++			
++			if (itemTemplate.getName().contains(" Recovery"))
++				count = rnd.nextInt(50) + 1;
++			
++			if (itemTemplate.getName().contains("Dye"))
++				count = rnd.nextInt(10) + 1;
++			
 +			if (rndItem >= 1458 && rndItem <= 1459) // D, C Crystals
 +				count = rnd.nextInt(5000) + 1;
 +			
 +			int price = itemTemplate.getReferencePrice();
++			
 +			if (storeType == 1)
 +			{
 +				price = (int) (REFFERENCE_PRICE_MULTIPLYER[rnd.nextInt(4)] * itemTemplate.getReferencePrice());
@@ -1009,26 +1090,52 @@ index 00000000..acead902
 +					price <<= 1;
 +			}
 +			
++			if (SET_ITEMS[rndItem])
++				price <<= 1;
++			
 +			genFakeTraderItems(fakePlayer, rndItem, price, count, storeType, tradeList, manufactureList);
 +		}
 +		
 +		fakePlayer.getInventory().restore();
-+		
-+		// fakePlayer.getInventory().equipItemAndRecord(itemInst);
-+		
++				
 +		// LOGGER.info("Trade bot " + fakePlayerName + " has in inventory: " + fakePlayer.getInventory().getItems());
 +		
-+		if (storeType == 1)
++		if (storeType == 1 && tradeList.size() > 0) // sell
 +		{
-+			fakePlayer.getSellList().setTitle("WTS " + tradeList.get(rnd.nextInt(tradeList.size())).getItem().getName());
++			// select item with max price overall
++			int maxPrice =  tradeList.get(0).getPrice() * tradeList.get(0).getCount();
++			String maxPriceName = tradeList.get(0).getItem().getName();
++			for (int i=0; i<tradeList.size(); i++) {
++				if (maxPrice < tradeList.get(i).getPrice() * tradeList.get(i).getCount()) {
++					maxPrice = tradeList.get(i).getPrice() * tradeList.get(i).getCount();
++					maxPriceName = tradeList.get(i).getItem().getName();
++				}
++			}
++			// cap the private store sell msg length at 29 characters maximum,
++			// otherwise Fermata client disconnects
++			String sellMsg = String.format("%1.25s", maxPriceName);
++			fakePlayer.getSellList().setTitle("WTS " + sellMsg);
++			fakePlayer.broadcastPacket(new PrivateStoreMsgSell(fakePlayer));
 +			fakePlayer.getSellList().updateItems(false);
 +		}
-+		else if (storeType == 3)
++		else if (storeType == 3 && tradeList.size() > 0) // buy
 +		{
-+			fakePlayer.getBuyList().setTitle("WTB " + tradeList.get(rnd.nextInt(tradeList.size())).getItem().getName());
++			// select item with max price overall
++			int maxPrice =  tradeList.get(0).getPrice() * tradeList.get(0).getCount();
++			String maxPriceName = tradeList.get(0).getItem().getName();
++			for (int i=0; i<tradeList.size(); i++) {
++				if (maxPrice < tradeList.get(i).getPrice() * tradeList.get(i).getCount()) {
++					maxPrice = tradeList.get(i).getPrice() * tradeList.get(i).getCount();
++					maxPriceName = tradeList.get(i).getItem().getName();
++				}
++			}
++			// cap the private store buy msg length at 29 characters maximum,
++			// otherwise Fermata client disconnects
++			String buyMsg = String.format("%1.25s", maxPriceName);
++			fakePlayer.getBuyList().setTitle("WTB " + buyMsg);
 +			fakePlayer.getBuyList().updateItems(true);
 +		}
-+		else if (storeType == 5)
++		else if (storeType == 5) // manufacture
 +		{
 +			ManufactureList storeList = fakePlayer.getManufactureList();
 +			storeList.setStoreName("Create D grade");
@@ -1041,7 +1148,7 @@ index 00000000..acead902
 +		fakePlayer.broadcastUserInfo();
 +		
 +		fakePlayer.sendInfo(fakePlayer);
-+		// fakePlayer.getAI().notifyEvent(AiEventType.SAT_DOWN, null, null);
++		fakePlayer.getAI().notifyEvent(AiEventType.SAT_DOWN, null, null);
 +		
 +	}
 +	
@@ -1246,31 +1353,31 @@ index 00000000..acead902
 +		
 +		// Coordinates 45350, 49530-50283, -3064, radius 276-753
 +		fakePlayer.getPosition().set(rs.getInt("x"), rs.getInt("y"), rs.getInt("z"), rs.getInt("heading"));
-+		// fakePlayer.getPosition().set(45350, 50283, -3064, rs.getInt("heading"));
-+		
++//		 fakePlayer.getPosition().set(45350, 50283, -3064, rs.getInt("heading"));
++
 +		fakePlayer.spawnMe();
-+		
-+		// Random rndX = new Random(), rndY = new Random();
-+		// boolean c1, c2;
-+		// do {
-+		// //fakePlayer.teleportTo(45350, 49530, -3064, rs.getInt("heading"));
-+		// fakePlayer.getPosition().set(45350, 49530, -3064, rs.getInt("heading"));
-+		// int newX = 45350, newY = 49530, counter = 0;
-+		// do {
-+		// if(counter++>5) {
-+		// newX = 45350;
-+		// newY = 49530;
-+		// counter = 0;
-+		// }
-+		// newX+=rndX.nextInt(1500)-750;
-+		// newY+=rndY.nextInt(1500)-750;
-+		// c1 = fakePlayer.isIn2DRadius(new Location(newX, newY, -3064), 750);
-+		// c2 = fakePlayer.isIn2DRadius(new Location(newX, newY, -3064), 276);
-+		// } while (!c1 || c2);
-+		// //fakePlayer.teleportTo(newX, newY, -3064, rs.getInt("heading"));
-+		// fakePlayer.getPosition().set(newX, newY, -3064, rs.getInt("heading"));
-+		// //fakePlayer.teleportTo(newX, newY, -3064, rs.getInt("heading"));
-+		// } while(findAllNearbyObjects(fakePlayer, 50));
++
++//		Random rndX = new Random(), rndY = new Random();
++//		boolean c1, c2;
++//		do {
++//			//fakePlayer.teleportTo(45350, 49530, -3064, rs.getInt("heading"));
++//			fakePlayer.getPosition().set(45350, 49530, -3064, rs.getInt("heading"));
++//			int newX = 45350, newY = 49530, counter = 0;
++//			do {
++//				if(counter++>5) {
++//					newX = 45350;
++//					newY = 49530;
++//					counter = 0;
++//				}
++//				newX+=rndX.nextInt(1500)-750;
++//				newY+=rndY.nextInt(1500)-750;
++//				c1 = fakePlayer.isIn2DRadius(new Location(newX, newY, -3064), 750);
++//				c2 = fakePlayer.isIn2DRadius(new Location(newX, newY, -3064), 276);
++//			} while (!c1 || c2);
++//			int absoluteZ = GeoEngine.getInstance().getHeight(newX, newY, -3064);
++//			fakePlayer.getPosition().set(newX, newY, absoluteZ, rs.getInt("heading"));
++//			//fakePlayer.teleportTo(newX, newY, absoluteZ, rs.getInt("heading"));
++//		} while(findAllNearbyObjects(fakePlayer, 50));
 +		
 +		fakePlayer.onPlayerEnter();
 +		
@@ -1305,8 +1412,8 @@ index 00000000..acead902
 +				clan.addClanMember(fakePlayer);
 +				//fakePlayer.sendPacket(new UserInfo(fakePlayer));
 +				fakePlayer.sendPacket(new PledgeShowMemberListAdd(fakePlayer));
-+				// // Save player clan info to database
-+				// //fakePlayer.store();
++				// Save player clan info to database
++				// fakePlayer.store();
 +			}
 +		}
 +		catch (Exception e)
@@ -1397,7 +1504,7 @@ index 00000000..acead902
 +	
 +	private static void genFakeTraderItems(Player fakePlayer, int itemId, int price, int count, int storeType, TradeList tradeList, ManufactureList manufactureList)
 +	{
-+		ItemInstance itemInst = ItemInstance.create(itemId, count); // Composition Bow
++		ItemInstance itemInst = ItemInstance.create(itemId, count);
 +		fakePlayer.getInventory().addItem(itemInst);
 +		
 +		if (storeType == 3)
@@ -1425,12 +1532,12 @@ index 00000000..acead902
 +	{
 +		int itemId = rs.getInt("item_id"), count = rs.getInt("count"), price = rs.getInt("price");
 +		
-+		ItemInstance itemInst = ItemInstance.create(itemId, count); // Composition Bow
++		ItemInstance itemInst = ItemInstance.create(itemId, count);
 +		fakePlayer.getInventory().addItem(itemInst);
 +		
 +		if (storeType == 3)
 +		{
-+			ItemInstance itemInst2 = ItemInstance.create(57, count * price);// add some adena, for buyers only!!!
++			ItemInstance itemInst2 = ItemInstance.create(57, count * price); // add some adena, for buyers only!!!
 +			fakePlayer.getInventory().addItem(itemInst2);
 +		}
 +		
@@ -1466,7 +1573,7 @@ index 00000000..acead902
 +		}
 +		
 +		// Refresh the bot's internal skill data
-+		bot.getStatus().initializeValues(); // bot.getSkillList().calculate(); //bot.sendSkillList();
++		bot.getStatus().initializeValues();
 +	}
 +	
 +	private static class SingletonHolder
